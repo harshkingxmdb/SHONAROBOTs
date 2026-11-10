@@ -1,0 +1,12 @@
+#FIX-BY-ALONE
+.git
+README.md
+sample.env
+*.png
+*.mp4
+*.webm
+logs.txt
+logs.tx
+restart_data.txt
+.gitignore
+app.json

@@ -1,0 +1,68 @@
+# Copyright (c) 2025 @THECDERQUEEN
+# Licensed under the MIT License.
+# This file is part of @SHONA_BOTS
+#SHONA-DECODER
+
+
+import asyncio
+
+from pyrogram import filters, types
+
+from AloneX.music import app, db, lang
+from AloneX.music.helpers import buttons, can_manage_vc
+
+DELETE_DELAY = 7
+
+
+async def _delete_later(message: types.Message) -> None:
+    try:
+        await asyncio.sleep(DELETE_DELAY)
+        await message.delete()
+    except Exception:
+        pass
+
+
+@app.on_message(filters.command(["vclogger", "vclog"]) & filters.group & ~app.bl_users)
+@can_manage_vc
+async def _vclogger(_, m: types.Message):
+    chat_lang = await lang.get_lang(m.chat.id)
+
+    if len(m.command) < 2:
+        enabled = await db.get_vc_logger(m.chat.id)
+        state = "enabled" if enabled else "disabled"
+        await m.reply_text(
+            chat_lang.get(
+                "vclogger_panel",
+                "Vc Logger Settings\n\nCurrent Status: {0}\n\nClick the button below to toggle the status:",
+            ).format(f"{'✅' if enabled else '❌'} {state}"),
+            reply_markup=buttons.vclogger_markup(m.chat.id, enabled),
+        )
+        return
+
+    mode = m.command[1].lower()
+    if mode in ("on", "enable"):
+        await db.set_vc_logger(m.chat.id, True)
+        msg = await m.reply_text(
+            chat_lang.get(
+                "vclogger_enabled",
+                "✅ VC Logger enabled.",
+            )
+        )
+        asyncio.create_task(_delete_later(msg))
+        return
+    elif mode in ("off", "disable"):
+        await db.set_vc_logger(m.chat.id, False)
+        msg = await m.reply_text(
+            chat_lang.get(
+                "vclogger_disabled",
+                "🚫 VC Logger disabled.",
+            )
+        )
+        asyncio.create_task(_delete_later(msg))
+        return
+    else:
+        msg = await m.reply_text(
+            chat_lang.get("vclogger_usage", "Usage: /vclogger [on|off]")
+        )
+        asyncio.create_task(_delete_later(msg))
+        return

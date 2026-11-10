@@ -1,0 +1,937 @@
+[
+    {
+        "content":"Having feelings for someone just brings sorrow to someone else. Someone always gets sacrificed and suffers. If this is what it means to fall in love, then falling in love is terrible.",
+        "anime":{
+            "id":497,
+            "name":"Nagi no Asukara"
+        },
+        "character":{
+            "id":837,
+            "name":"Hikari Sakishima"
+        }
+    },
+    {
+        "content":"Even the worst evil saves something... even the greatest good hurts someone.",
+        "anime":{
+            "id":272,
+            "name":"Hanamonogatari"
+        },
+        "character":{
+            "id":321,
+            "name":"Rouka Numachi"
+        }
+    },
+    {
+        "content":"Being too rigid makes you fragile. You'll end up breaking yourself and those around you.",
+        "anime":{
+            "id":321,
+            "name":"Strike the Blood"
+        },
+        "character":{
+            "id":1301,
+            "name":"Yukina Himeragi"
+        }
+    },
+    {
+        "content":"In this world, who knows who might kill who.",
+        "anime":{
+            "id":271,
+            "name":"Detective Conan"
+        },
+        "character":{
+            "id":1303,
+            "name":"Shinichi Kudou"
+        }
+    },
+    {
+        "content":"It may be better to go and regret it rather than staying here and regretting it. If you don’t move forward, you can’t gain anything.",
+        "anime":{
+            "id":336,
+            "name":"Little Busters!"
+        },
+        "character":{
+            "id":1304,
+            "name":"Futaki Kanata"
+        }
+    },
+    {
+        "content":"I'll never show you my tears. These are the tears of those who died with regrets. If there's a way to take away these regrets, I'll make sure I'll find it.",
+        "anime":{
+            "id":260,
+            "name":"Soul Eater"
+        },
+        "character":{
+            "id":665,
+            "name":"Black Star"
+        }
+    },
+    {
+        "content":"[to Ichigo] I don't care if you're a human, a Soul Reaper or even a Hollow! I'll crush anybody who looks down on me! And you, Kurosaki, will be the first to go!",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":2476,
+            "name":"Grimmjow Jeagerjaques"
+        }
+    },
+    {
+        "content":"If it's not enough to believe in justice, then I will become justice. I will seek out all evil in this world and wipe them out like the clouds in the sky. I swear I will...For justice.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":2143,
+            "name":"Tousen Kaname"
+        }
+    },
+    {
+        "content":"Damn that sister of mine! She's always talking about our father, but what did that baldy ever do for us?! He just played Othello with us from time to time!",
+        "anime":{
+            "id":349,
+            "name":"Gintama"
+        },
+        "character":{
+            "id":706,
+            "name":"Shimura Shinpachi"
+        }
+    },
+    {
+        "content":"No matter what may happen... As long as you walk by my side... There shall be no enemy that can stand before us.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":285,
+            "name":"Aizen Sousuke"
+        }
+    },
+    {
+        "content":"I… have nothing… to say… Ubuyashiki… cleverly… hid… himself.",
+        "anime":{
+            "id":1002,
+            "name":"Demon Slayer: Kimetsu no Yaiba"
+        },
+        "character":{
+            "id":2561,
+            "name":"Kokushibo"
+        }
+    },
+    {
+        "content":"The strong feed upon the weak. It’s such an obligingly simple rule. Except in this world, my friends tried to be strong.",
+        "anime":{
+            "id":985,
+            "name":"Attack on Titan"
+        },
+        "character":{
+            "id":2509,
+            "name":"Armin Arlert"
+        }
+    },
+    {
+        "content":"Go further! If you’re a man. If you call yourself a man! There’s no other way to go but forward!",
+        "anime":{
+            "id":1002,
+            "name":"Demon Slayer: Kimetsu no Yaiba"
+        },
+        "character":{
+            "id":2539,
+            "name":"Sabito"
+        }
+    },
+    {
+        "content":"It’s only natural for demons to defeat Humans.",
+        "anime":{
+            "id":1002,
+            "name":"Demon Slayer: Kimetsu no Yaiba"
+        },
+        "character":{
+            "id":2531,
+            "name":"Muzan Kibutsuji"
+        }
+    },
+    {
+        "content":"Yuji, You’re a strong kid, so help people.",
+        "anime":{
+            "id":988,
+            "name":"Jujutsu Kaisen"
+        },
+        "character":{
+            "id":2546,
+            "name":"Wasuke Itadori"
+        }
+    },
+    {
+        "content":"Seele Schneider isn't a sword. [strings the weapon on his bow] A Quincy's only weapons...Are bows and arrows. [fires the Seele Schneider]",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":2467,
+            "name":"Uryuu Ishida"
+        }
+    },
+    {
+        "content":"Living should mean no do-overs. This is for the best.",
+        "anime":{
+            "id":1001,
+            "name":"Steins Gate"
+        },
+        "character":{
+            "id":2517,
+            "name":"Rintaro Okabe"
+        }
+    },
+    {
+        "content":"No matter what the world, the god of that world creates the rules. In truth, you have been defeated by the rules I created. And as punishment for defying the God of the new world, you will die...",
+        "anime":{
+            "id":480,
+            "name":"Death Note"
+        },
+        "character":{
+            "id":763,
+            "name":"Light Yagami"
+        }
+    },
+    {
+        "content":"Let's show him...that the good guys always win.",
+        "anime":{
+            "id":480,
+            "name":"Death Note"
+        },
+        "character":{
+            "id":966,
+            "name":"L Lawliet"
+        }
+    },
+    {
+        "content":"Disappear. My sword does not exist to crush insects like you.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":257,
+            "name":"Kuchiki Byakuya"
+        }
+    },
+    {
+        "content":"And what's the real lesson? Don't leave things in the fridge.",
+        "anime":{
+            "id":457,
+            "name":"Cowboy Bebop"
+        },
+        "character":{
+            "id":2123,
+            "name":"Spike Spiegel"
+        }
+    },
+    {
+        "content":"Make a contract with me, and become a magical girl!",
+        "anime":{
+            "id":495,
+            "name":"Mahou Shoujo Madoka Magica"
+        },
+        "character":{
+            "id":683,
+            "name":"Kyubee"
+        }
+    },
+    {
+        "content":"When you're in high school you should be doing things, about which you could never tell your parents!",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":2326,
+            "name":"Kurosaki Isshin"
+        }
+    },
+    {
+        "content":"Welcome home. Thank you for your great efforts.",
+        "anime":{
+            "id":578,
+            "name":"D.Gray-man"
+        },
+        "character":{
+            "id":2327,
+            "name":"Komui Lee"
+        }
+    },
+    {
+        "content":"As long as I exist, I don't care if there's hell, or if only suffering exists there.",
+        "anime":{
+            "id":193,
+            "name":"Durarara!!"
+        },
+        "character":{
+            "id":225,
+            "name":"Izaya Orihara"
+        }
+    },
+    {
+        "content":"I'mma... I'm not very good at talking with girls. They make me nervous.",
+        "anime":{
+            "id":260,
+            "name":"Soul Eater"
+        },
+        "character":{
+            "id":361,
+            "name":"Crona"
+        }
+    },
+    {
+        "content":"I'm surrounded by idiots.",
+        "anime":{
+            "id":580,
+            "name":"Hellsing"
+        },
+        "character":{
+            "id":1579,
+            "name":"Integra Hellsing"
+        }
+    },
+    {
+        "content":"I coulda been a contendah...",
+        "anime":{
+            "id":445,
+            "name":"Yu-Gi-Oh!"
+        },
+        "character":{
+            "id":663,
+            "name":"Joey Wheeler"
+        }
+    },
+    {
+        "content":"For there to be pain, there has to be kindness. For darkness to stand out, there has to be the sun.",
+        "anime":{
+            "id":565,
+            "name":"Fruits Basket"
+        },
+        "character":{
+            "id":1214,
+            "name":"Kyoko Honda"
+        }
+    },
+    {
+        "content":"*to Rei Miyamoto* I'd be an actor if I could look happy right now.",
+        "anime":{
+            "id":679,
+            "name":"Highschool Of The Dead"
+        },
+        "character":{
+            "id":2294,
+            "name":"Takashi Komuro"
+        }
+    },
+    {
+        "content":"It's a simple formula. The greater the tragedy, the greater the emotional effect.",
+        "anime":{
+            "id":254,
+            "name":"Trigun"
+        },
+        "character":{
+            "id":2297,
+            "name":"Legato Bluesummers"
+        }
+    },
+    {
+        "content":"They say the tongue is the root of all misfortune.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":1242,
+            "name":"Rukia Kuchiki"
+        }
+    },
+    {
+        "content":"Where is your honor!? Like all pure-blooded Saiyans, Kakarot would rather die fighting than win with one of those disgraceful senzu beans as his crutch! Kakarot trained in the hyperbolic time chamber just as we did! Now let’s see what he can do!",
+        "anime":{
+            "id":525,
+            "name":"Dragon Ball Z"
+        },
+        "character":{
+            "id":859,
+            "name":"Vegeta"
+        }
+    },
+    {
+        "content":"We have to find a way to face this scar.",
+        "anime":{
+            "id":260,
+            "name":"Soul Eater"
+        },
+        "character":{
+            "id":864,
+            "name":"Maka Albarn"
+        }
+    },
+    {
+        "content":"Are you talking to me, scum? I'm God.",
+        "anime":{
+            "id":622,
+            "name":"Angel Beats!"
+        },
+        "character":{
+            "id":1561,
+            "name":"Ayato Naoi"
+        }
+    },
+    {
+        "content":"It was just a rebound! Don't make a big deal over one or two arms!",
+        "anime":{
+            "id":538,
+            "name":"Fullmetal Alchemist"
+        },
+        "character":{
+            "id":506,
+            "name":"Edward Elric"
+        }
+    },
+    {
+        "content":"*to Haruhi* Are you a moron?",
+        "anime":{
+            "id":319,
+            "name":"The Melancholy of Haruhi Suzumiya"
+        },
+        "character":{
+            "id":401,
+            "name":"Kyon"
+        }
+    },
+    {
+        "content":"I shall light a fire upon the fang that falls short, so that I needn't see that star...So that it shall not tear this throat of mine.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":2236,
+            "name":"Abarai Renji"
+        }
+    },
+    {
+        "content":"Though you fight a fierce battle on the outside, your inner world trembles not the slightest.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":1812,
+            "name":"Zangetsu"
+        }
+    },
+    {
+        "content":"Is there... somebody precious to you?",
+        "anime":{
+            "id":266,
+            "name":"Naruto"
+        },
+        "character":{
+            "id":1606,
+            "name":"Haku"
+        }
+    },
+    {
+        "content":"Bring on the hardship. It's preferred in a path of carnage.",
+        "anime":{
+            "id":229,
+            "name":"One Piece"
+        },
+        "character":{
+            "id":507,
+            "name":"Roronoa Zoro"
+        }
+    },
+    {
+        "content":"Hard work is worthless for those that don't believe in themselves.",
+        "anime":{
+            "id":266,
+            "name":"Naruto"
+        },
+        "character":{
+            "id":450,
+            "name":"Naruto Uzumaki"
+        }
+    },
+    {
+        "content":"\"Checkmate\" doesn\\'t mean you\\'ve simply cornered the enemy king. It\\'s a declaration that the enemy king is yours. That\\'s why I said it the first time I met you. \"Checkmate.\"",
+        "anime":{
+            "id":203,
+            "name":"No Game No Life"
+        },
+        "character":{
+            "id":229,
+            "name":"Sora"
+        }
+    },
+    {
+        "content":"We know our weakness. Now what will we do?\nWe'll get stronger! We'll get up and fight!",
+        "anime":{
+            "id":199,
+            "name":"Fairy Tail"
+        },
+        "character":{
+            "id":537,
+            "name":"Natsu Dragneel"
+        }
+    },
+    {
+        "content":"[To Kyo] Being away from everyone else may be lonely, but being away from you will be even lonelier.",
+        "anime":{
+            "id":565,
+            "name":"Fruits Basket"
+        },
+        "character":{
+            "id":947,
+            "name":"Honda Tohru"
+        }
+    },
+    {
+        "content":"*to Inuyasha* You fight as though you're still a child.",
+        "anime":{
+            "id":218,
+            "name":"Inuyasha"
+        },
+        "character":{
+            "id":2418,
+            "name":"Sesshomaru"
+        }
+    },
+    {
+        "content":"Heroes always die due to unreasonable orders.",
+        "anime":{
+            "id":421,
+            "name":"Fate/stay night"
+        },
+        "character":{
+            "id":1858,
+            "name":"Lancer"
+        }
+    },
+    {
+        "content":"Seeing the same thing at that time and place, either moving forward or running away... I suppose that's what separates those who are fit for battle from those who are not.",
+        "anime":{
+            "id":571,
+            "name":"Claymore"
+        },
+        "character":{
+            "id":2450,
+            "name":"Irene"
+        }
+    },
+    {
+        "content":"Tragic he said. I'm tragic?",
+        "anime":{
+            "id":218,
+            "name":"Inuyasha"
+        },
+        "character":{
+            "id":245,
+            "name":"Kikyo"
+        }
+    },
+    {
+        "content":"The trick of real combat is that everyone is human.",
+        "anime":{
+            "id":456,
+            "name":"Code Geass: Lelouch of the Rebellion"
+        },
+        "character":{
+            "id":709,
+            "name":"Lelouch Lamperouge"
+        }
+    },
+    {
+        "content":"When pressured, people tend to choose the decision that is best fitted to the situation, but they usually realize later on, that it was a mistake.",
+        "anime":{
+            "id":371,
+            "name":"Prince Of Tennis"
+        },
+        "character":{
+            "id":1930,
+            "name":"Tezuka Kunimitsu"
+        }
+    },
+    {
+        "content":"This is how culture spreads. When someone has a new idea, it is immediately copied.",
+        "anime":{
+            "id":899,
+            "name":"Jinrui wa Suitai Shimashita"
+        },
+        "character":{
+            "id":1931,
+            "name":"Watashi"
+        }
+    },
+    {
+        "content":"Remember this... no matter where you go, the strength of your mind and spirit is the most powerful magic of all.",
+        "anime":{
+            "id":900,
+            "name":"Magic Knight Rayearth"
+        },
+        "character":{
+            "id":1932,
+            "name":"Princess Emeraude"
+        }
+    },
+    {
+        "content":"Time waits for no one.",
+        "anime":{
+            "id":901,
+            "name":"The Girl Who Leapt Through Time"
+        },
+        "character":{
+            "id":1933,
+            "name":"The Girl Who Leapt Through Time"
+        }
+    },
+    {
+        "content":"All those who wander in the darkness seek the light, but when they reach the light, they turn away their eyes from the blinding glare.",
+        "anime":{
+            "id":426,
+            "name":"Ergo Proxy"
+        },
+        "character":{
+            "id":617,
+            "name":"Kazkis Hauer"
+        }
+    },
+    {
+        "content":"Liars always say the same things. \"I\\'ll believe in you. I\\'ll protect you. I care about you.\" I\\'ll never believe that again... No one will ever protect me. I won\\'t even think about it. I\\'ll fight alone, live alone, and die alone. I know... I\\'ve felt it on my skin and in my body... That it\\'s better not to believe in anyone than believe and be betrayed!",
+        "anime":{
+            "id":427,
+            "name":"Rokka no Yuusha"
+        },
+        "character":{
+            "id":618,
+            "name":"Fremy Speedraw"
+        }
+    },
+    {
+        "content":"I work to support my hobby. So if you asked me which I'd choose, my job or my hobby, my hobby takes priority.",
+        "anime":{
+            "id":393,
+            "name":"Gate: Jieitai Kanochi nite Kaku Tatakaeri"
+        },
+        "character":{
+            "id":562,
+            "name":"Itami Youji"
+        }
+    },
+    {
+        "content":"Studying is important, but I think love is too. It's the last summer of high school. It's a precious time that won't come again.",
+        "anime":{
+            "id":204,
+            "name":"ReLIFE"
+        },
+        "character":{
+            "id":232,
+            "name":"Kaizaki Arata"
+        }
+    },
+    {
+        "content":"All adults are the same in the end. At first they are kind and sympathetic to make you drop your guard, then they try to kill you if you don't do as they say. That how adults always are. They're losers. The damn bastards!",
+        "anime":{
+            "id":354,
+            "name":"Mayoiga"
+        },
+        "character":{
+            "id":619,
+            "name":"Jack"
+        }
+    },
+    {
+        "content":"No matter what happens, no matter what, never stop, always keep walking.",
+        "anime":{
+            "id":578,
+            "name":"D.Gray-man"
+        },
+        "character":{
+            "id":1638,
+            "name":"Mana Walker"
+        }
+    },
+    {
+        "content":"There's no one the world would be better off without.",
+        "anime":{
+            "id":832,
+            "name":"Arata Kangatari"
+        },
+        "character":{
+            "id":1639,
+            "name":"Arata Hinohara"
+        }
+    },
+    {
+        "content":"Doing what one likes is the right of the powerful.",
+        "anime":{
+            "id":281,
+            "name":"Tokyo Ghoul"
+        },
+        "character":{
+            "id":867,
+            "name":"Yakumo Oomori"
+        }
+    },
+    {
+        "content":"So laugh... demon... Laugh that arrogant laugh of yours... And remember, I beat you to it...",
+        "anime":{
+            "id":681,
+            "name":"Hellsing Ultimate"
+        },
+        "character":{
+            "id":1577,
+            "name":"Alexander Anderson"
+        }
+    },
+    {
+        "content":"Man, kids these days. They think it's a competition to have the most friends. One is enough. Find someone completely unique.",
+        "anime":{
+            "id":224,
+            "name":"Noragami"
+        },
+        "character":{
+            "id":310,
+            "name":"Yato"
+        }
+    },
+    {
+        "content":"You’re too kind. Remember this and take it to heart: kindness sometimes leads to even greater tragedy.",
+        "anime":{
+            "id":495,
+            "name":"Mahou Shoujo Madoka Magica"
+        },
+        "character":{
+            "id":1219,
+            "name":"Homura Akemi"
+        }
+    },
+    {
+        "content":"Even if I can't see you... No matter how far away you may be... I will always be watching you.",
+        "anime":{
+            "id":199,
+            "name":"Fairy Tail"
+        },
+        "character":{
+            "id":533,
+            "name":"Makarov Dreyar"
+        }
+    },
+    {
+        "content":"I can't deny, I don't know very much about Rukia. That's not the point, I might not risk my life for her, but Ichigo wants to save her life and that's all I need to know. What may seem like an unworthy cause to you is more than enough reason for me.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":1867,
+            "name":"Yasutora Sado"
+        }
+    },
+    {
+        "content":"If you give me wings, I will soar for you even if this whole land sinks down to the water. If you give me a sword, I will fight for you even if this whole sky shoots through with your light.",
+        "anime":{
+            "id":222,
+            "name":"Bleach"
+        },
+        "character":{
+            "id":779,
+            "name":"Kurosaki Ichigo"
+        }
+    },
+    {
+        "content":"To climb a hill on a difficult road, you need to be walking steadily.",
+        "anime":{
+            "id":685,
+            "name":"Kore Wa Zombie Desu Ka?"
+        },
+        "character":{
+            "id":981,
+            "name":"Ayumu Aikawa"
+        }
+    },
+    {
+        "content":"People share only one common fate... death.",
+        "anime":{
+            "id":266,
+            "name":"Naruto"
+        },
+        "character":{
+            "id":1215,
+            "name":"Neji Hyuuga"
+        }
+    },
+    {
+        "content":"I won't give up, I will fight til the bitter end, cause there's no way I will back down after what you did to my friends. They are what made me the person I am today, that's why I'll keep fighting... For my friends!",
+        "anime":{
+            "id":199,
+            "name":"Fairy Tail"
+        },
+        "character":{
+            "id":1758,
+            "name":"Lucy Heartfilia"
+        }
+    },
+    {
+        "content":"Is it that you get the power, then you choose to protect someone else? No! We first want to protect someone, that's why we try to get stronger in the first place.",
+        "anime":{
+            "id":408,
+            "name":"Toaru Majutsu no Index"
+        },
+        "character":{
+            "id":1160,
+            "name":"Kamijou Touma"
+        }
+    },
+    {
+        "content":"The heart becomes scratched and dented and repaired over time, and with one glance, you'd be able to tell your own from others.",
+        "anime":{
+            "id":189,
+            "name":"Spice and Wolf"
+        },
+        "character":{
+            "id":865,
+            "name":"Kraft Lawrence"
+        }
+    },
+    {
+        "content":"Sometimes, it's necessary to look back at the past in order to move on to the future.",
+        "anime":{
+            "id":349,
+            "name":"Gintama"
+        },
+        "character":{
+            "id":620,
+            "name":"Okita Sougo"
+        }
+    },
+    {
+        "content":"If nobody cares to accept you and wants you in this world, accept yourself and you will see that you don't need them and their selfish ideas.",
+        "anime":{
+            "id":429,
+            "name":"MAGI: The Labyrinth Of Magic"
+        },
+        "character":{
+            "id":609,
+            "name":"Alibaba Saluja"
+        }
+    },
+    {
+        "content":"I need to get stronger. So Senpai won’t have to transform!",
+        "anime":{
+            "id":1007,
+            "name":"Kaiju No. 8"
+        },
+        "character":{
+            "id":2583,
+            "name":"Leno Ichikawa"
+        }
+    },
+    {
+        "content":"I’ll do everything I can, no matter what it is, until I reach Mina’s side.",
+        "anime":{
+            "id":1007,
+            "name":"Kaiju No. 8"
+        },
+        "character":{
+            "id":2580,
+            "name":"Kafka Hibino"
+        }
+    },
+    {
+        "content":"Regardless of whether your friends believe, you still care for them, correct? Isn't that why you feel so sad?",
+        "anime":{
+            "id":750,
+            "name":"Rokujouma no Shinryakusha!?"
+        },
+        "character":{
+            "id":1397,
+            "name":"Harumi Sakuraba"
+        }
+    },
+    {
+        "content":"Why do you still want to be my friend? Is it because you feel comfortable being with me? Because I understand your awkward and useless self, and yet still love you? Quit acting so spoiled. When you rejected me, you lost the right to want those things!",
+        "anime":{
+            "id":647,
+            "name":"Golden Time"
+        },
+        "character":{
+            "id":1131,
+            "name":"Tada Banri"
+        }
+    },
+    {
+        "content":"If you don't like how things turned out, then try to change it. And then if it still doesn't work out, that's when you can be depressed.",
+        "anime":{
+            "id":725,
+            "name":"Ryuugajou Nanana No Maizoukin"
+        },
+        "character":{
+            "id":1341,
+            "name":"Nanana Ryuugajou"
+        }
+    },
+    {
+        "content":"In this world, there are things you’re better off not knowing.",
+        "anime":{
+            "id":641,
+            "name":"Kanon"
+        },
+        "character":{
+            "id":1163,
+            "name":"Aizawa Yuuichi"
+        }
+    },
+    {
+        "content":"What we need now is not the diary of the past, but instead the calendar of the future.",
+        "anime":{
+            "id":664,
+            "name":"Legend of the Galactic Heroes"
+        },
+        "character":{
+            "id":1549,
+            "name":"Dusty Attenborough"
+        }
+    },
+    {
+        "content":"I have someone I like. I never had the confidence and I’ve doubted my feelings countless of times. But, when she stays by my side and smiles with me, I feel like I can do anything.",
+        "anime":{
+            "id":476,
+            "name":"Tonari No Kaibutsu-kun"
+        },
+        "character":{
+            "id":1550,
+            "name":"Yoshida Haru"
+        }
+    },
+    {
+        "content":"Freedom, isn’t something earned through suffering or pushing yourself. You must accept yourself just as you are and live according to the flow of things; that is true freedom.",
+        "anime":{
+            "id":811,
+            "name":"Samurai Champloo"
+        },
+        "character":{
+            "id":1552,
+            "name":"Monk Zuikou"
+        }
+    },
+    {
+        "content":"Humans are suspicious and jealous creatures. When they see something perfect, they wanna find a flaw.",
+        "anime":{
+            "id":271,
+            "name":"Detective Conan"
+        },
+        "character":{
+            "id":1040,
+            "name":"Hattori Heiji"
+        }
+    }
+      ]
