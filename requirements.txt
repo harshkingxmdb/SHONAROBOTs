@@ -29,7 +29,7 @@ kurigram>=2.2.26
 yt-dlp[default]>=2026.8.19
 
 # ---- music system (AloneX/music) ----
-ntgcalls==3.0.0
+ntgcalls==3.0.6
 py-tgcalls==3.0.0
 py-yt-search~=0.7.4
 pymongo>=4.17.0
