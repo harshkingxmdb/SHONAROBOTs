@@ -1,52 +1,83 @@
+# =====================================================================================
+#  SHONA ROBOT  -  ONE CONFIG FOR EVERYTHING  (Robot + Music)
+#
+#  1. HELPERS
+#  2. CORE            shared by Robot and Music (token, database, api, log group)
+#  3. OWNER & SUDO    shared by Robot and Music
+#  4. ROBOT           manage bot settings
+#  5. MUSIC           music system settings  (class MusicConfig, used by AloneX/music)
+#
+#  Everything is read from environment variables / .env, nothing else to edit.
+#  Music reuses the CORE values, so you never configure anything twice.
+# =====================================================================================
 import os
 from os import getenv
+
 from dotenv import load_dotenv
 
 load_dotenv()
 
-prefix_cmds = ['!', '?', '$', '/', '\\', '.', '*', '-','&', '#', ',']
+
+# =====================================================================================
+#  1. HELPERS
+# =====================================================================================
+def _bool(name: str, default: str = "False") -> bool:
+    return getenv(name, default).strip().lower() in ("true", "1", "yes")
 
 
-# for stream 
-MULTI_CLIENT:bool = getenv('MULTI_CLIENT', 'False').lower() == 'true'
-multi_clients, work_loads = {}, {}
+def _int(value, default: int = 0) -> int:
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return default
 
 
-# necessary
-PREFIX = getenv('PREFIX', 'True').lower() == 'true'
-TOKEN: str = getenv('TOKEN')
-DB_URL: str = getenv('DB_URL')
-DB_URL2: str = getenv('DB_URL2')
+def _first(*names: str, default=None):
+    """First non-empty environment variable among `names`."""
+    for name in names:
+        value = getenv(name)
+        if value not in (None, ""):
+            return value
+    return default
+
+
+def _ids(name: str, default: str) -> list:
+    """'1 2 3' -> [1, 2, 3]"""
+    return [int(x) for x in getenv(name, default).split() if x.isdigit()]
+
+
+def _url(value: str) -> str:
+    """'@name' / 'name' / full link -> always a https://t.me/ link."""
+    value = (value or "").strip()
+    if value.startswith("http"):
+        return value
+    return "https://t.me/" + value.lstrip("@")
+
+
+# =====================================================================================
+#  2. CORE  (shared by Robot + Music)
+# =====================================================================================
+TOKEN: str = getenv("TOKEN")
+DB_URL: str = getenv("DB_URL")
+DB_URL2: str = getenv("DB_URL2")
 
 if not TOKEN or not DB_URL:
     print("❌ ERROR: 'TOKEN' and 'DB_URL' environment variables are required.")
     exit(1)
 
-BOT_ID: int = int(TOKEN.split(':')[0])
-API_ID: int = int(getenv('API_ID', '0'))
-API_HASH: str = getenv('API_HASH')
-ELEVENLABS_API_KEY = getenv('ELEVENLABS_API_KEY', "sk_b60525985e2cce19eabdc4fec8d28640cfa1229490c4e22c")
-IMAGE_UPLOAD_KEY = getenv('IMAGE_UPLOAD_KEY', "d8f59b7c8846df826a9c8428f7a44a0d")
+BOT_ID: int = int(TOKEN.split(":")[0])
+API_ID: int = int(getenv("API_ID", "0"))
+API_HASH: str = getenv("API_HASH")
 
-GROQ_API_KEY = getenv('GROQ_API_KEY', "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")
-GEMINI_API_KEY = getenv('GEMINI_API_KEY', "AQ.Ab8RN6K2KBi5tOIbrxu2V9HfSyFM4t4obDlSQQr6Nw5My7bWhQ")
-MONSTER_API_KEY = getenv('MONSTER_API_KEY', "0")
-REPLICATE_API_TOKEN = getenv('REPLICATE_API_TOKEN', "r8_csE10UhwOz72TOQ3x4qFYz8tOVkEOEQ3VQb4Q")
+BOT_USERNAME = getenv("BOT_USERNAME", "@shonaxrobot")
+BOT_NAME = getenv("BOT_NAME", "Eiko")
 
-# Get this value from @MissRose_Bot on Telegram by /id
-ALONE_OWNER_ID = int(getenv("ALONE_OWNER_ID", "0"))
-# Chat id of a group for logging bot's activities
+# Chat id of the group where the bot logs its activity (starts with -100).
+# The bot must be admin there; the music assistant account must be able to post there too.
 LOG_GROUP_ID = int(getenv("LOG_GROUP_ID", "0"))
+LOGGER_ID = int(getenv("LOGGER_ID", "0"))
 
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/shona_bots")
-
-START_IMG_URL = getenv("START_IMG_URL", "https://files.catbox.moe/1gxuh7.jpg")
-
-
-SUPPORT_CHAT = getenv('SUPPORT_CHAT', 'shona_support')
-UPDATE_CHANNEL = getenv('UPDATE_CHANNEL', 'shona_bots')
-
-_logs_channel = getenv('LOGS_CHANNEL') or getenv('LOG_GROUP_ID') or getenv('LOGGER_ID')
+_logs_channel = getenv("LOGS_CHANNEL") or getenv("LOG_GROUP_ID") or getenv("LOGGER_ID")
 if _logs_channel:
     try:
         LOGS_CHANNEL = int(_logs_channel)
@@ -55,16 +86,21 @@ if _logs_channel:
 else:
     LOGS_CHANNEL = None
 
-LOGGER_ID = int(getenv('LOGGER_ID', '0'))
-BOT_USERNAME = getenv('BOT_USERNAME', '@shonaxrobot')
-BOT_NAME = getenv('BOT_NAME', 'Eiko')
-IS_WEB_SUP = getenv('IS_WEB_SUP', 'True').lower() == 'true'
+# Robot's own user account (Pyrogram string session). NOT the music assistant - music uses SESSION1/2/3.
+USER_STRING = getenv("USER_STRING")
 
-SUDO_USERS = [int(x) for x in getenv("SUDO_USERS", "8213572855").split() if x.isdigit()]
-SUPPORT_USERS = [int(x) for x in getenv("SUPPORT_USERS", "8213572855").split() if x.isdigit()]
-WHITELIST_USERS = [int(x) for x in getenv("WHITELIST_USERS", "8213572855").split() if x.isdigit()]
+
+# =====================================================================================
+#  3. OWNER & SUDO  (shared by Robot + Music)
+# =====================================================================================
+# Get this value from @MissRose_Bot on Telegram by /id
+ALONE_OWNER_ID = int(getenv("ALONE_OWNER_ID", "0"))
 OWNER_ID = int(getenv("OWNER_ID", "8213572855"))
-DEV_LIST = [int(x) for x in getenv("DEV_LIST", "8213572855").split() if x.isdigit()]
+
+SUDO_USERS = _ids("SUDO_USERS", "8213572855")
+SUPPORT_USERS = _ids("SUPPORT_USERS", "8213572855")
+WHITELIST_USERS = _ids("WHITELIST_USERS", "8213572855")
+DEV_LIST = _ids("DEV_LIST", "8213572855")
 
 SPAM_USERS = {}
 
@@ -72,43 +108,52 @@ PREMIUM_USERS = []
 PREMIUM_USERS.extend(DEV_LIST)
 
 
+# =====================================================================================
+#  4. ROBOT  (manage bot)
+# =====================================================================================
+prefix_cmds = ['!', '?', '$', '/', '\\', '.', '*', '-', '&', '#', ',']
+PREFIX = getenv("PREFIX", "True").lower() == "true"
 
-#vc player
-USER_STRING = getenv('USER_STRING')
+# ---- stream ----
+MULTI_CLIENT: bool = getenv("MULTI_CLIENT", "False").lower() == "true"
+multi_clients, work_loads = {}, {}
+STREAM_MOD = getenv("STREAM_MOD", "False").lower() == "true"
 
-#gist
-GIST_TOKEN = getenv('GIST_TOKEN')
+# ---- third party api keys ----
+ELEVENLABS_API_KEY = getenv("ELEVENLABS_API_KEY", "sk_b60525985e2cce19eabdc4fec8d28640cfa1229490c4e22c")
+IMAGE_UPLOAD_KEY = getenv("IMAGE_UPLOAD_KEY", "d8f59b7c8846df826a9c8428f7a44a0d")
+GROQ_API_KEY = getenv("GROQ_API_KEY", "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")
+GEMINI_API_KEY = getenv("GEMINI_API_KEY", "AQ.Ab8RN6K2KBi5tOIbrxu2V9HfSyFM4t4obDlSQQr6Nw5My7bWhQ")
+MONSTER_API_KEY = getenv("MONSTER_API_KEY", "0")
+REPLICATE_API_TOKEN = getenv("REPLICATE_API_TOKEN", "r8_csE10UhwOz72TOQ3x4qFYz8tOVkEOEQ3VQb4Q")
+GIST_TOKEN = getenv("GIST_TOKEN")
 
+# ---- support links ----
+SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/shona_bots")
+SUPPORT_CHAT = getenv("SUPPORT_CHAT", "shona_support")
+UPDATE_CHANNEL = getenv("UPDATE_CHANNEL", "shona_bots")
 
-
-
-
-# keep alive ( web support )
-WEB_URL = getenv('WEB_URL', "https://t.me/shona_bots")
-
-KEEP_ALIVE = getenv('KEEP_ALIVE', 'True').lower() == 'true'
+# ---- web server / keep alive (Heroku) ----
+IS_WEB_SUP = getenv("IS_WEB_SUP", "True").lower() == "true"
+WEB_URL = getenv("WEB_URL", "https://t.me/shona_bots")
+KEEP_ALIVE = getenv("KEEP_ALIVE", "True").lower() == "true"
 PORT = int(os.environ.get("PORT", 8080))
 BIND_ADDRESS = str(os.environ.get("WEB_SERVER_BIND_ADDRESS", "0.0.0.0"))
-WEB_SLEEP = int(getenv('WEB_SLEEP', '240'))
+WEB_SLEEP = int(getenv("WEB_SLEEP", "240"))
 
-# pagination & stuffs
-AUTO_DEL = int(getenv('AUTO_DEL', '10'))
-BTN_COLUMNS = int(getenv('BTN_COLUMNS', '2'))
-BTN_ROWS = int(getenv('BTN_ROWS', '6'))
+# ---- pagination & misc ----
+AUTO_DEL = int(getenv("AUTO_DEL", "10"))
+BTN_COLUMNS = int(getenv("BTN_COLUMNS", "2"))
+BTN_ROWS = int(getenv("BTN_ROWS", "6"))
 
-
-# some media source
-PM_START_IMG = getenv('PM_START_IMG', "https://tmpfiles.org/w9wkpElfIw5N/video_2026-09-26_10-47-38.mp4")
-
-HELP_CMD_IMG = getenv('HELP_CMD_IMG', "https://litter.catbox.moe/p6c5zt.jpg")
-
-
-HELP_MODULE_IMG = getenv('HELP_MODULE_IMG', "https://litter.catbox.moe/p6c5zt.jpg")
-
-START_IMG = getenv('START_IMG', "https://tmpfiles.org/w9wkpElfIw5N/video_2026-09-26_10-47-38.mp4")
-
-
-FORCE_JOIN_IMG = getenv('FORCE_JOIN_IMG', "https://litter.catbox.moe/p6c5zt.jpg")
+# ---- media ----
+# Robot start screen: PM_START_IMG = /start in private, START_IMG = /start in groups.
+# Music has no start image of its own (its panel opens from the Robot start menu).
+PM_START_IMG = getenv("PM_START_IMG", "https://tmpfiles.org/w9wkpElfIw5N/video_2026-09-26_10-47-38.mp4")
+START_IMG = getenv("START_IMG", "https://tmpfiles.org/w9wkpElfIw5N/video_2026-09-26_10-47-38.mp4")
+HELP_CMD_IMG = getenv("HELP_CMD_IMG", "https://litter.catbox.moe/p6c5zt.jpg")
+HELP_MODULE_IMG = getenv("HELP_MODULE_IMG", "https://litter.catbox.moe/p6c5zt.jpg")
+FORCE_JOIN_IMG = getenv("FORCE_JOIN_IMG", "https://litter.catbox.moe/p6c5zt.jpg")
 
 AF_START_STICKERS = [
   "CAACAgUAAxkBAAEBrV9nWukpft8gmtrZVMkbO4GKlZy0HQACWxUAAnHv2FZkjr7WjG3OjzYE",
@@ -177,18 +222,13 @@ AF_PHOTOS = [
 ]
 
 
-
-
-
-
-#autofilter & file store
+# ---- autofilter & file store ----
 AF_USERS = []
-AF_USERS.extend(DEV_LIST) # load devs
+AF_USERS.extend(DEV_LIST)  # load devs
 
-STREAM_MOD = getenv('STREAM_MOD', 'False').lower() == 'true'
-AF_FILE_DEL_TIME = int(getenv('AF_FILE_DEL_TIME', str(30*60)))
-AF_SUB_CHAT = getenv('AF_SUB_CHAT', "@AloneUpdates")
-FILE_DB_CHANNEL = int(getenv('FILE_DB_CHANNEL', '0')) # file store channel
+AF_FILE_DEL_TIME = int(getenv("AF_FILE_DEL_TIME", str(30 * 60)))
+AF_SUB_CHAT = getenv("AF_SUB_CHAT", "@AloneUpdates")
+FILE_DB_CHANNEL = int(getenv("FILE_DB_CHANNEL", "0"))  # file store channel
 AF_SUB_TEXT = getenv('AF_SUB_TEXT', """
 <blockquote><b>
 To access your files, first click on [📢 Join Our Channel/Group]. Once you've joined, click the [📁 Get File] button to download your files. We're glad to have you with us!
@@ -202,4 +242,70 @@ AF_QS_TEXT = getenv('AF_QS_TEXT', """
 """)
 
 
-MODULE = {} # all loaded help commands
+# =====================================================================================
+#  5. MUSIC  (used by AloneX/music  ->  `from config import MusicConfig`)
+#     Reuses everything from CORE / OWNER above, so only music-only options live here.
+# =====================================================================================
+class MusicConfig:
+    def __init__(self):
+        # ---- shared with the Robot (see CORE) ----
+        self.API_ID = API_ID
+        self.API_HASH = API_HASH
+        self.BOT_TOKEN = TOKEN
+        self.OWNER_ID = ALONE_OWNER_ID or OWNER_ID
+        # music keeps its own database ("Anon") on the same cluster, so nothing clashes
+        self.MONGO_URL = _first("MUSIC_MONGO_URL") or DB_URL
+        self.LOGGER_ID = _int(_first("MUSIC_LOGGER_ID")) or LOG_GROUP_ID or LOGGER_ID
+
+        # ---- music assistant accounts (Pyrogram string sessions) ----
+        # SESSION1 is required for music, SESSION2 / SESSION3 are optional extra assistants.
+        self.SESSION1 = _first("SESSION1", "SESSION")
+        self.SESSION2 = _first("SESSION2")
+        self.SESSION3 = _first("SESSION3")
+
+        # ---- links ----
+        self.SUPPORT_CHANNEL = _url(UPDATE_CHANNEL)
+        self.SUPPORT_CHAT = _url(SUPPORT_CHAT)
+        self.OWNER_USERNAME = _url(getenv("OWNER_USERNAME", "https://t.me/thecderqueen"))
+        self.DEFAULT_THUMB = getenv("DEFAULT_THUMB", "https://te.legra.ph/file/3e40a408286d4eda24191.jpg")
+        self.PING_IMG = getenv("PING_IMG", "https://files.catbox.moe/haagg2.png")
+
+        # ---- behaviour ----
+        self.AUTO_END = _bool("AUTO_END", "False")
+        self.AUTO_LEAVE = _bool("AUTO_LEAVE", "True")
+        self.VIDEO_PLAY = _bool("VIDEO_PLAY", "True")
+        self.QUEUE_LIMIT = int(getenv("QUEUE_LIMIT", "2000"))
+        self.DURATION_LIMIT = int(getenv("DURATION_LIMIT", "17000"))
+        self.PLAYLIST_LIMIT = int(getenv("PLAYLIST_LIMIT", "2000"))
+
+        # ---- stream quality ----
+        self.AUDIO_QUALITY = getenv("AUDIO_QUALITY", "HIGH")      # HIGH / STUDIO
+        self.VIDEO_QUALITY = getenv("VIDEO_QUALITY", "HD_720p")   # SD_480p / HD_720p / FHD_1080p
+        # True: /vplay downloads the video first (smooth). False: stream directly (fast join).
+        self.VIDEO_DOWNLOAD = _bool("VIDEO_DOWNLOAD", "True")
+
+        # ---- music apis ----
+        # /play : main API first, Inflex when it fails / limit is over
+        self.API_URL = getenv("API_URL", "https://api.onegrab.fun")
+        self.API_KEY = getenv("API_KEY", "68027e_n0JU9_N0Y_DlKp_OTFGmVMdtLkb6TPZy")
+        self.INFLEX_API_URL = getenv("INFLEX_API_URL", "https://teaminflex.xyz")
+        self.INFLEX_API_KEY = getenv("INFLEX_API_KEY", "INFLEX42847728D")
+        # /vplay : Shruti API only (key from @SHRUTIAPIBOT)
+        self.SHRUTI_API_URL = getenv("SHRUTI_API_URL", "https://api.shrutibots.in")
+        self.SHRUTI_API_KEY = getenv("SHRUTI_API_KEY", "ShrutiBotspUErr2mxArElKbWI4pVU")
+
+    def missing(self) -> list:
+        """Names of required music settings that are not configured."""
+        required = ["API_ID", "API_HASH", "BOT_TOKEN", "MONGO_URL", "LOGGER_ID", "OWNER_ID", "SESSION1"]
+        return [name for name in required if not getattr(self, name)]
+
+    def check(self):
+        missing = self.missing()
+        if missing:
+            raise SystemExit(f"Music: missing required environment variables: {', '.join(missing)}")
+
+
+# =====================================================================================
+#  help modules registry (filled at runtime by the plugins)
+# =====================================================================================
+MODULE = {}  # all loaded help commands
