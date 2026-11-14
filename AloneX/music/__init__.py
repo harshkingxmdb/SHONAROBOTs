@@ -47,9 +47,10 @@ except Exception as _e:
 
 __version__ = "3.0.1"
 
-from AloneX.music.config import Config
+# One config for everything: the music settings live in the root config.py (class MusicConfig).
+from config import MusicConfig
 
-config = Config()
+config = MusicConfig()
 tasks = []
 boot = time.time()
 
@@ -60,7 +61,7 @@ READY = not config.missing()
 if not READY:
     logger.warning(
         "Music system is DISABLED - missing settings: %s. "
-        "Set them in .env (SESSION or USER_STRING is the assistant account).",
+        "Set them in .env (SESSION1 is the music assistant account).",
         ", ".join(config.missing()),
     )
 else:
