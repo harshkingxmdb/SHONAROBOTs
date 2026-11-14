@@ -1,6 +1,6 @@
 {
-  "name": "Alone X Robot",
-  "description": "Telegram Group Management and Music Bot",
+  "name": "Shona Robot",
+  "description": "Telegram group management bot with a built-in music system",
   "repository": "https://github.com/TeamAloneOp/EikoRobot",
   "logo": "https://files.catbox.moe/1gxuh7.jpg",
   "keywords": [
@@ -13,74 +13,76 @@
   ],
   "env": {
     "TOKEN": {
-      "description": "Your bot token from @BotFather",
-      "required": true,
-      "value": "YOUR BOT TOKEN"
+      "description": "Bot token from @BotFather",
+      "required": true
     },
     "DB_URL": {
-      "description": "Your MongoDB URI for database",
-      "required": true,
-      "value": "YOUR MONGO DB"
-    },
-    "DB_URL2": {
-      "description": "Your second MongoDB URI for database (optional but recommended)",
-      "required": false,
-      "value": "YOUR MONGODB DB"
+      "description": "MongoDB connection URI (mongodb+srv://...)",
+      "required": true
     },
     "API_ID": {
-      "description": "Your Telegram API_ID from my.telegram.org",
-      "required": true,
-      "value": "17596251"
+      "description": "Telegram API_ID from my.telegram.org",
+      "required": true
     },
     "API_HASH": {
-      "description": "Your Telegram API_HASH from my.telegram.org",
-      "required": true,
-      "value": "e58343b4c0193e293e391daf97603fcd"
+      "description": "Telegram API_HASH from my.telegram.org",
+      "required": true
     },
     "ALONE_OWNER_ID": {
-      "description": "Your Telegram User ID",
-      "required": true,
-      "value": "BOT OWNER ID"
+      "description": "Your Telegram user id (the bot owner)",
+      "required": true
     },
     "LOG_GROUP_ID": {
-      "description": "Group ID for logs (should start with -100)",
-      "required": true,
-      "value": "BOT LOGGER GROUP ID"
+      "description": "Log group id, starts with -100. Bot must be admin there (music uses it too)",
+      "required": true
     },
-    "SUPPORT_CHAT": {
-      "description": "Your support group username (without @)",
-      "required": false,
-      "value": "YOUR SUPPORT GROUP"
-    },
-    "UPDATE_CHANNEL": {
-      "description": "Your update channel username (without @)",
-      "required": false,
-      "value": "YOUR SUPPORT CHANNEL"
-    },
-    "OWNER_ID": {
-      "description": "Owner ID (same as ALONE_OWNER_ID)",
-      "required": false,
-      "value": "BOT OWNER ID"
-    },
-    "SUDO_USERS": {
-      "description": "Sudo users ID separated by space",
-      "required": false,
-      "value": "SUDO USER ID"
-    },
-    "USER_STRING": {
-      "description": "Pyrogram STRING SESSION of the assistant account that joins voice chats (needed for the Music system)",
-      "required": false,
-      "value": "ASSISTANT STRING SESSION"
+    "SESSION1": {
+      "description": "MUSIC: string session of the main music assistant account. Without it only the Robot runs (no music)",
+      "required": false
     },
     "SESSION2": {
-      "description": "Optional 2nd music assistant string session",
-      "required": false,
-      "value": ""
+      "description": "MUSIC (optional): 2nd assistant account string session",
+      "required": false
     },
     "SESSION3": {
-      "description": "Optional 3rd music assistant string session",
-      "required": false,
-      "value": ""
+      "description": "MUSIC (optional): 3rd assistant account string session",
+      "required": false
+    },
+    "USER_STRING": {
+      "description": "ROBOT (optional): string session of the robot's own user account (vc player). Not used for music",
+      "required": false
+    },
+    "DB_URL2": {
+      "description": "Optional: second MongoDB URI",
+      "required": false
+    },
+    "SUDO_USERS": {
+      "description": "Optional: sudo user ids separated by space",
+      "required": false
+    },
+    "OWNER_ID": {
+      "description": "Optional: extra owner id (defaults are in config.py)",
+      "required": false
+    },
+    "SUPPORT_CHAT": {
+      "description": "Optional: support group username without @",
+      "required": false
+    },
+    "UPDATE_CHANNEL": {
+      "description": "Optional: update channel username without @",
+      "required": false
+    },
+    "BOT_NAME": {
+      "description": "Optional: bot display name",
+      "required": false
+    },
+    "BOT_USERNAME": {
+      "description": "Optional: bot username with @",
+      "required": false
+    },
+    "WEB_URL": {
+      "description": "Optional: your Heroku app url (https://APPNAME.herokuapp.com) for keep-alive pings",
+      "required": false
     }
   },
   "buildpacks": [
