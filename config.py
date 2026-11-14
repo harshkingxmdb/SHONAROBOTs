@@ -227,7 +227,7 @@ AF_USERS = []
 AF_USERS.extend(DEV_LIST)  # load devs
 
 AF_FILE_DEL_TIME = int(getenv("AF_FILE_DEL_TIME", str(30 * 60)))
-AF_SUB_CHAT = getenv("AF_SUB_CHAT", "@AloneUpdates")
+AF_SUB_CHAT = getenv("AF_SUB_CHAT", "@shona_bots")
 FILE_DB_CHANNEL = int(getenv("FILE_DB_CHANNEL", "0"))  # file store channel
 AF_SUB_TEXT = getenv('AF_SUB_TEXT', """
 <blockquote><b>
