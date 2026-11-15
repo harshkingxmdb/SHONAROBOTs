@@ -22,8 +22,9 @@ from urllib.parse import urlencode
 import aiohttp
 from py_yt import Playlist, VideosSearch
 
-from AloneX import config, logger
-from AloneX.helpers import Track, utils
+from AloneX.music import app, config, logger
+from AloneX.music.core._api import FallenApi
+from AloneX.music.helpers import Track, utils
 
 DOWNLOAD_DIR = "downloads"
 
