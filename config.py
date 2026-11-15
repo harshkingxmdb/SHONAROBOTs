@@ -304,15 +304,13 @@ class MusicConfig:
         # True: /vplay downloads the video first (smooth). False: stream directly (fast join).
         self.VIDEO_DOWNLOAD = _bool("VIDEO_DOWNLOAD", "True")
 
-        # ---- music apis ----
-        # /play : main API first, Inflex when it fails / limit is over
-        self.API_URL = getenv("API_URL", "https://api.onegrab.fun")
-        self.API_KEY = getenv("API_KEY", "68027e_n0JU9_N0Y_DlKp_OTFGmVMdtLkb6TPZy")
-        self.INFLEX_API_URL = getenv("INFLEX_API_URL", "http://187.127.120.51")
-        self.INFLEX_API_KEY = getenv("INFLEX_API_KEY", "INFLEX79337828D")
-        # /vplay : Shruti API only (key from @SHRUTIAPIBOT)
-        self.SHRUTI_API_URL = getenv("SHRUTI_API_URL", "https://api.shrutibots.in")
-        self.SHRUTI_API_KEY = getenv("SHRUTI_API_KEY", "ShrutiBotspUErr2mxArElKbWI4pVU")
+        # ---- API (single API: search, /play, /vplay, all platforms) ----
+        # Key: https://yt.riteshyt.in/dashboard  (ya Telegram bot par /generate)
+        self.RITESH_API_URL = getenv("RITESH_API_URL", "https://api.riteshyt.in")
+        self.RITESH_API_KEY = getenv("RITESH_API_KEY", "riteshfree486b70904aef797c782587af")
+        # Purana Fallen client (core/_api.py) ab use nahi hota; defaults khali hain
+        self.API_URL = getenv("API_URL", "")
+        self.API_KEY = getenv("API_KEY", "")
 
     def missing(self) -> list:
         """Names of required music settings that are not configured."""
