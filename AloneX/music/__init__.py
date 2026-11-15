@@ -8,6 +8,7 @@
 # manage bot's .env, so the manage bot keeps working even if music is not configured.
 
 import time
+import asyncio
 import logging
 
 import shutil
@@ -21,6 +22,30 @@ if not shutil.which("ffmpeg"):
         static_ffmpeg.add_paths()
     except Exception:  # pragma: no cover
         pass
+
+# pytgcalls runs `ffprobe` on a stream link and kills it after a timeout. When the process has
+# already exited by then, asyncio raises ProcessLookupError and the whole play() call crashes
+# (seen on Heroku). Killing / terminating a process that is already gone is a harmless no-op, so
+# ignore that error. Nothing else is changed.
+if not getattr(asyncio.subprocess.Process, "_music_safe_signals", False):
+    _orig_kill = asyncio.subprocess.Process.kill
+    _orig_terminate = asyncio.subprocess.Process.terminate
+
+    def _safe_kill(self):
+        try:
+            _orig_kill(self)
+        except ProcessLookupError:
+            pass
+
+    def _safe_terminate(self):
+        try:
+            _orig_terminate(self)
+        except ProcessLookupError:
+            pass
+
+    asyncio.subprocess.Process.kill = _safe_kill
+    asyncio.subprocess.Process.terminate = _safe_terminate
+    asyncio.subprocess.Process._music_safe_signals = True
 
 # NOTE: the manage bot already configures the root logger, so no basicConfig() here.
 logging.getLogger("httpx").setLevel(logging.ERROR)
