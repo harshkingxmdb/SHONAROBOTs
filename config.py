@@ -11,6 +11,7 @@
 #  Music reuses the CORE values, so you never configure anything twice.
 # =====================================================================================
 import os
+import re
 from os import getenv
 
 from dotenv import load_dotenv
@@ -54,6 +55,25 @@ def _url(value: str) -> str:
     return "https://t.me/" + value.lstrip("@")
 
 
+_TG_NAME = re.compile(r"^@?[A-Za-z][A-Za-z0-9_]{3,31}$")
+
+
+def _tg(name: str, default: str) -> str:
+    """Telegram username or link from env. A wrong value (spaces, placeholder text, empty)
+    would make Telegram reject the start buttons with BUTTON_URL_INVALID, so fall back."""
+    raw = (getenv(name) or "").strip()
+    if not raw:
+        return default
+    if raw.startswith("t.me/"):
+        raw = "https://" + raw
+    if raw.startswith(("http://", "https://")) and " " not in raw:
+        return raw
+    if _TG_NAME.match(raw):
+        return raw
+    print(f"⚠️ {name}={raw!r} is not a valid Telegram username/link -> using default {default!r}")
+    return default
+
+
 # =====================================================================================
 #  2. CORE  (shared by Robot + Music)
 # =====================================================================================
@@ -69,7 +89,7 @@ BOT_ID: int = int(TOKEN.split(":")[0])
 API_ID: int = int(getenv("API_ID", "0"))
 API_HASH: str = getenv("API_HASH")
 
-BOT_USERNAME = getenv("BOT_USERNAME", "@shonaxrobot")
+BOT_USERNAME = "@" + _tg("BOT_USERNAME", "@shonaxrobot").lstrip("@")
 BOT_NAME = getenv("BOT_NAME", "Eiko")
 
 # Chat id of the group where the bot logs its activity (starts with -100).
@@ -129,9 +149,9 @@ REPLICATE_API_TOKEN = getenv("REPLICATE_API_TOKEN", "r8_csE10UhwOz72TOQ3x4qFYz8t
 GIST_TOKEN = getenv("GIST_TOKEN")
 
 # ---- support links ----
-SUPPORT_GROUP = getenv("SUPPORT_GROUP", "https://t.me/shona_bots")
-SUPPORT_CHAT = getenv("SUPPORT_CHAT", "shona_support")
-UPDATE_CHANNEL = getenv("UPDATE_CHANNEL", "shona_bots")
+SUPPORT_GROUP = _tg("SUPPORT_GROUP", "https://t.me/shona_bots")
+SUPPORT_CHAT = _tg("SUPPORT_CHAT", "shona_support")
+UPDATE_CHANNEL = _tg("UPDATE_CHANNEL", "shona_bots")
 
 # ---- web server / keep alive (Heroku) ----
 IS_WEB_SUP = getenv("IS_WEB_SUP", "True").lower() == "true"
@@ -288,8 +308,8 @@ class MusicConfig:
         # /play : main API first, Inflex when it fails / limit is over
         self.API_URL = getenv("API_URL", "https://api.onegrab.fun")
         self.API_KEY = getenv("API_KEY", "68027e_n0JU9_N0Y_DlKp_OTFGmVMdtLkb6TPZy")
-        self.INFLEX_API_URL = getenv("INFLEX_API_URL", "https://teaminflex.xyz")
-        self.INFLEX_API_KEY = getenv("INFLEX_API_KEY", "INFLEX42847728D")
+        self.INFLEX_API_URL = getenv("INFLEX_API_URL", "http://187.127.120.51")
+        self.INFLEX_API_KEY = getenv("INFLEX_API_KEY", "INFLEX79337828D")
         # /vplay : Shruti API only (key from @SHRUTIAPIBOT)
         self.SHRUTI_API_URL = getenv("SHRUTI_API_URL", "https://api.shrutibots.in")
         self.SHRUTI_API_KEY = getenv("SHRUTI_API_KEY", "ShrutiBotspUErr2mxArElKbWI4pVU")
@@ -309,3 +329,4 @@ class MusicConfig:
 #  help modules registry (filled at runtime by the plugins)
 # =====================================================================================
 MODULE = {}  # all loaded help commands
+          
