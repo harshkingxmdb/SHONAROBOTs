@@ -6,6 +6,7 @@ from telegram import Update
 from AloneX.helpers.utils import get_as_document, get_message_link
 from AloneX.helpers.scripts import paste
 from telegram.constants import ParseMode
+from telegram.error import BadRequest, NetworkError, RetryAfter, TimedOut
 
 
 
@@ -16,6 +17,14 @@ import json
 
 async def error_handler(update, context) -> None:
     """Log the error and send a telegram message to notify the developer."""
+    err = context.error
+
+    # Network blips (httpx.ReadError, timeouts, flood waits) happen while polling, there is no update
+    # and PTB retries on its own. Log one short line instead of a huge traceback + log-channel spam.
+    if isinstance(err, (NetworkError, TimedOut, RetryAfter)) and not isinstance(err, BadRequest):
+        LOGGER.warning(f"Network error (auto-retry): {type(err).__name__}: {err}")
+        return
+
     # Log the error before we do anything else, so we can see it even if something breaks.
     LOGGER.error("Exception while handling an update:", exc_info=context.error)
 
@@ -56,8 +65,7 @@ async def error_handler(update, context) -> None:
                 f"> Raw link: {raw_url}\n"
             )
 
-      
-        link = get_message_link(update.effective_message)
+
         if LOGS_CHANNEL:
             await context.bot.send_document(
                   LOGS_CHANNEL,
