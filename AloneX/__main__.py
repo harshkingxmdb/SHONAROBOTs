@@ -54,7 +54,8 @@ async def start_music_safe():
         from AloneX.music.runner import start_music
         await start_music()
     except (Exception, SystemExit) as e:
-        logging.error(f"Music system disabled: {e}")
+        # exc_info prints the full traceback, so the exact file / line of the problem is visible
+        logging.error(f"Music system disabled: {e}", exc_info=True)
 
 
 async def stop_music_safe():
