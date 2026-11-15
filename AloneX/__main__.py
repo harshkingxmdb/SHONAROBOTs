@@ -49,7 +49,7 @@ def import_plugins(package):
 
 
 async def start_music_safe():
-    """Start the music system. A problem in music must never stop the manage bot."""
+    """Start the music system. A problem in music must never stop the Robot."""
     try:
         from AloneX.music.runner import start_music
         await start_music()
@@ -93,12 +93,13 @@ if __name__ == '__main__':
 
     # music runs inside this same process / event loop (after the shared clients are up)
     loop.run_until_complete(start_music_safe())
-    
+
     logging.info("Starting PTB Application...")
     try:
-        app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES)
+        # close_loop=False: PTB must not close the loop, we still need it to stop music cleanly
+        app.run_polling(drop_pending_updates=True, allowed_updates=Update.ALL_TYPES, close_loop=False)
     finally:
         try:
-            asyncio.get_event_loop().run_until_complete(stop_music_safe())
-        except Exception:
-            pass
+            loop.run_until_complete(stop_music_safe())
+        except Exception as e:
+            logging.error(f"Shutdown error: {e}")
