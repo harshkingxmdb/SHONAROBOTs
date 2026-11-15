@@ -14,9 +14,9 @@ from urllib.parse import urlencode
 import aiohttp
 from py_yt import Playlist, VideosSearch
 
-from AloneX import app, config, logger
-from AloneX.core._api import FallenApi
-from AloneX.helpers import Track, utils
+from AloneX.music import app, config, logger
+from AloneX.music.core._api import FallenApi
+from AloneX.music.helpers import Track, utils
 
 DOWNLOAD_DIR = "downloads"
 
