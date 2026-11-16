@@ -55,6 +55,39 @@ logging.getLogger("pyrogram").setLevel(logging.ERROR)
 logging.getLogger("pytgcalls").setLevel(logging.ERROR)
 logger = logging.getLogger(__name__)
 
+
+def _fix_apt_library_path() -> None:
+    """Heroku's apt buildpack installs ffmpeg under ~/.apt, but the folder that holds
+    libpulsecommon-*.so (usr/lib/<arch>/pulseaudio) is not on LD_LIBRARY_PATH, so ffmpeg AND ffprobe die
+    with "error while loading shared libraries: libpulsecommon-17.0.so". Add that folder to the
+    environment: every ffmpeg / ffprobe we start inherits it. Safe no-op everywhere else."""
+    try:
+        import glob
+        import os
+
+        apt = os.path.join(os.environ.get("HOME", "/app"), ".apt")
+        if not os.path.isdir(apt):
+            return
+        found = {
+            os.path.dirname(path)
+            for path in glob.glob(os.path.join(apt, "usr", "lib", "**", "libpulsecommon-*.so"), recursive=True)
+        }
+        current = [d for d in os.environ.get("LD_LIBRARY_PATH", "").split(":") if d]
+        extra = [d for d in sorted(found) if d not in current]
+        if extra:
+            os.environ["LD_LIBRARY_PATH"] = ":".join(current + extra)
+            logger.info(f"[FFmpeg] added to LD_LIBRARY_PATH: {', '.join(extra)}")
+        elif not found:
+            logger.error(
+                "[FFmpeg] libpulsecommon-*.so not found under ~/.apt - add `libpulse0` to the Aptfile "
+                "if ffmpeg still fails to start."
+            )
+    except Exception as e:  # never break startup because of this
+        logger.warning(f"[FFmpeg] library path fix skipped: {type(e).__name__}: {e}")
+
+
+_fix_apt_library_path()
+
 # "Too many open files" fix: the default limit (often 1024) is far too low for a
 # music bot (every call = ffmpeg pipes, every request = a socket). Raise the
 # soft limit up to the hard limit.
