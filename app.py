@@ -236,7 +236,8 @@ async def stream_handler(request: web.Request):
     except FIleNotFound as e:
         raise web.HTTPNotFound(text=e.message)
     except (AttributeError, BadStatusLine, ConnectionResetError):
-        pass
+        # e.g. /favicon.ico has no message id -> answer 404 instead of returning None (-> HTTP 500)
+        return web.Response(status=404, text="Not found")
     except Exception as e:
         logger.critical(e.with_traceback(None))
         raise web.HTTPInternalServerError(text=str(e))
@@ -262,7 +263,8 @@ async def stream_handler(request: web.Request):
     except FIleNotFound as e:
         raise web.HTTPNotFound(text=e.message)
     except (AttributeError, BadStatusLine, ConnectionResetError):
-        pass
+        # e.g. /favicon.ico has no message id -> answer 404 instead of returning None (-> HTTP 500)
+        return web.Response(status=404, text="Not found")
     except Exception as e:
         logger.critical(e.with_traceback(None))
         raise web.HTTPInternalServerError(text=str(e))
@@ -414,3 +416,4 @@ if __name__ == "__main__":
         web.run_app(web_server(), host="0.0.0.0", port=port)
     except (KeyboardInterrupt, SystemExit):
         logger.info("Shutting down web app")
+    
