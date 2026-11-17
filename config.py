@@ -140,12 +140,12 @@ multi_clients, work_loads = {}, {}
 STREAM_MOD = getenv("STREAM_MOD", "False").lower() == "true"
 
 # ---- third party api keys ----
-ELEVENLABS_API_KEY = getenv("ELEVENLABS_API_KEY", "sk_b60525985e2cce19eabdc4fec8d28640cfa1229490c4e22c")
-IMAGE_UPLOAD_KEY = getenv("IMAGE_UPLOAD_KEY", "d8f59b7c8846df826a9c8428f7a44a0d")
-GROQ_API_KEY = getenv("GROQ_API_KEY", "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")
+ELEVENLABS_API_KEY = getenv("ELEVENLABS_API_KEY", "")
+IMAGE_UPLOAD_KEY = getenv("IMAGE_UPLOAD_KEY", "c4ca3530479b76ed2b5b10ac82a719c4")
+GROQ_API_KEY = getenv("GROQ_API_KEY", "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")
 GEMINI_API_KEY = getenv("GEMINI_API_KEY", "AQ.Ab8RN6K2KBi5tOIbrxu2V9HfSyFM4t4obDlSQQr6Nw5My7bWhQ")
 MONSTER_API_KEY = getenv("MONSTER_API_KEY", "0")
-REPLICATE_API_TOKEN = getenv("REPLICATE_API_TOKEN", "r8_csE10UhwOz72TOQ3x4qFYz8tOVkEOEQ3VQb4Q")
+REPLICATE_API_TOKEN = getenv("REPLICATE_API_TOKEN", "r8_Wis2Jd4QIKQQPfwtLIjNbOyJqBaeow60fvaoo")
 GIST_TOKEN = getenv("GIST_TOKEN")
 
 # ---- support links ----
