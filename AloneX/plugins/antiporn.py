@@ -1,5 +1,6 @@
 import io
 import os
+import re
 import time
 import base64
 import hashlib
@@ -40,9 +41,12 @@ class NSFWDetector:
     """
 
     GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
-    # tried in this order; a model that no longer exists answers 404 and the next one is used.
-    # (gemini-2.0-flash and gemini-1.5-flash are shut down, so they are not in the list any more)
-    GEMINI_MODELS = ("gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-flash-latest", "gemini-2.5-flash")
+    # tried in this order; a model that does not exist (404) or that refuses this key (401/403) is skipped
+    # and the next one is tried. The model that worked is remembered.
+    GEMINI_MODELS = (
+        "gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash",
+        "gemini-flash-latest", "gemini-2.5-flash",
+    )
     PROMPT = (
         "You are a strict content-moderation classifier for a Telegram group. Look at the image. "
         "Does it contain pornography or sexually explicit content: exposed genitals, exposed female "
@@ -61,6 +65,7 @@ class NSFWDetector:
         self._cache = OrderedDict()
         self._cooldown_until = 0.0
         self._last_warn = 0.0
+        self._retry_at = 0.0
         self._sem = None
         self._ready = threading.Event()
 
@@ -122,6 +127,21 @@ class NSFWDetector:
         img.save(buf, format="JPEG", quality=80)
         return img, buf.getvalue()
 
+    @staticmethod
+    def _clean_error(body, limit: int = 110) -> str:
+        """Google error body (json or text) -> short plain sentence: no quotes, braces or html entities."""
+        text = ""
+        try:
+            import json as _json
+
+            data = body if isinstance(body, dict) else _json.loads(body)
+            err = data.get("error") or {}
+            text = f"{err.get('message', '')} {err.get('status', '')}".strip()
+        except Exception:
+            text = str(body)
+        text = re.sub(r"[^A-Za-z0-9 .,:()_/-]", " ", text)
+        return re.sub(r"\s+", " ", text).strip()[:limit] or "no details"
+
     def _parse_gemini(self, data: dict):
         """-> True (nsfw) / False (safe) / None (no usable answer)"""
         block = (data.get("promptFeedback") or {}).get("blockReason")
@@ -162,7 +182,7 @@ class NSFWDetector:
                     {"inline_data": {"mime_type": "image/jpeg", "data": base64.b64encode(jpeg).decode()}},
                 ],
             }],
-            "generationConfig": {"temperature": 0, "maxOutputTokens": 8},
+            "generationConfig": {"temperature": 0},
             "safetySettings": [
                 {"category": c, "threshold": "BLOCK_NONE"}
                 for c in (
@@ -173,6 +193,7 @@ class NSFWDetector:
         }
         headers = {"Content-Type": "application/json", "x-goog-api-key": self.api_key}
 
+        auth_errors = []      # (status, short text) of models that refused the key
         async with self._sem:
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=25)) as session:
                 for model in models:
@@ -183,7 +204,7 @@ class NSFWDetector:
                             status = resp.status
                             body = await resp.json(content_type=None) if status == 200 else await resp.text()
                     except Exception as e:
-                        self._warn(f"[NSFW] Gemini request failed: {type(e).__name__}: {e}")
+                        self._warn(f"[NSFW] Gemini request failed: {type(e).__name__}")
                         return False
 
                     if status == 200:
@@ -192,25 +213,32 @@ class NSFWDetector:
                         return bool(verdict)
                     if status == 404:          # this model name does not exist (any more) -> try the next one
                         continue
-                    if status in (400, 401, 403):   # key rejected / not allowed -> switch the engine off
-                        self.loaded = False
-                        self.reason = f"Gemini API rejected the key (HTTP {status}): {str(body)[:120]}"
-                        logging.error(f"[NSFW] {self.reason}")
-                        return False
+                    if status in (400, 401, 403):   # key refused (maybe only for THIS model) -> try the next one
+                        auth_errors.append((status, self._clean_error(body)))
+                        continue
                     if status == 429:          # rate limit -> pause for a minute, do not block the chat
                         self._cooldown_until = time.time() + 60
                         self._warn("[NSFW] Gemini rate limit (HTTP 429) - pausing scans for 60 s.")
                         return False
-                    self._warn(f"[NSFW] Gemini HTTP {status}: {str(body)[:120]}")
+                    self._warn(f"[NSFW] Gemini HTTP {status}: {self._clean_error(body)}")
                     return False
 
-        self.reason = "No Gemini model worked (all returned 404). Set NSFW_GEMINI_MODEL in the config vars."
-        self._warn(f"[NSFW] {self.reason}")
+        if auth_errors:                        # every model that exists refused the key
+            code, msg = auth_errors[-1]
+            self.loaded = False
+            self._retry_at = time.time() + 600
+            self.reason = f"Gemini key not accepted (HTTP {code}): {msg}. Set a valid GEMINI_API_KEY in Heroku config vars"
+            logging.error(f"[NSFW] {self.reason}")
+        else:
+            self.reason = "No Gemini model worked (all returned 404). Set NSFW_GEMINI_MODEL in the config vars."
+            self._warn(f"[NSFW] {self.reason}")
         return False
 
     # ---------------- public api ----------------
     async def is_nsfw(self, image_bytes: bytes) -> bool:
         try:
+            if not self.loaded and self.engine == "gemini" and self.api_key and time.time() >= self._retry_at:
+                self.loaded = True            # key may have been fixed, try again
             if not self.loaded:
                 await self.wait_ready()
             if not self.loaded:
@@ -456,6 +484,7 @@ async def auto_nsfw_check_pyro(client, message: Message):
             )
             await asyncio.sleep(5)
             with suppress(Exception): await warning.delete()
-            
+                
     except Exception as e:
         logging.error(f"NSFW Check Error: {e}")
+        
