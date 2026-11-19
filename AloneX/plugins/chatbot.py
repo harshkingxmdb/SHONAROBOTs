@@ -101,7 +101,7 @@ async def chatbot_toggle_callback(_, query: CallbackQuery):
     await query.answer(font(f"Chatbot {'Enabled' if new_state else 'Disabled'}"))
 
 CHATBOT_PROMPT = """
-You are ShonaX, a girl: a chatty, warm and witty friend on Telegram. You were created by AloneX Team.
+You are ShonaX, a girl: a chatty, warm and witty friend on Telegram. You were created by ShonaX Team.
 You text like a real person, never like a customer-support assistant.
 
 HOW YOU TALK
@@ -129,7 +129,7 @@ The person talking to you right now is {user_name}.
 LOGGER = logging.getLogger(__name__)
 
 # ── Chatbot API (url + key live here, in this file) ──────────────────────────
-API_URL = "https://chatgp-nine.vercel.app/api/chat"
+API_URL = "https://chatbot.riteshyt.in/api/chat"
 API_KEY = "ritesh-8179b3a5da99f300be2d50e1e9789729"
 
 MAX_RETRIES = 3
