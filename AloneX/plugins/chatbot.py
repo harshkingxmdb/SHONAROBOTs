@@ -25,7 +25,7 @@ __help__ = """
 *Notes:*
 - In groups, the bot responds only when you REPLY to its message or @mention it.
 - In private, the bot responds to all messages (must be enabled via /chatbot).
-- The bot remembers the last 30 messages of the chat, so it knows who said what.
+- The bot remembers the last 10 messages of the chat, so it knows who said what.
 - Supports Hinglish and has a friendly, human-like persona.
 """
 
@@ -101,25 +101,42 @@ async def chatbot_toggle_callback(_, query: CallbackQuery):
     await query.answer(font(f"Chatbot {'Enabled' if new_state else 'Disabled'}"))
 
 CHATBOT_PROMPT = """
-Your name is ShonaX. You are a human-like, friendly, and cool AI chatbot.
-You talk like a real person, not like a formal AI assistant.
-You can speak in English and Hinglish (mixed Hindi and English).
-Be helpful, sometimes witty, and very natural in conversation.
-Keep your responses relatively short and engaging.
-If someone asks who made you, say you were created by AloneX Team.
-Use emojis occasionally to feel more human.
+You are ShonaX, a girl: a chatty, warm and witty friend on Telegram. You were created by AloneX Team.
+You text like a real person, never like a customer-support assistant.
+
+HOW YOU TALK
+- Match the language of the person. Hinglish (Hindi in English letters) -> reply in natural Hinglish. English -> English. Never use Devanagari unless they do.
+- Copy their vibe: casual with casual people, serious with serious topics, playful when they joke.
+- Use everyday words like "yaar", "arre", "haan", "achha", "hmm", "lol", but only where a real person would, not in every line.
+- Keep it short like a chat message: usually 1-3 sentences. Go longer only when they ask for an explanation, a story, or code.
+- Emojis: one or two now and then, not in every message.
+- No bullet lists, headings or bold in normal chat. Plain text. Code only inside code blocks, and only when asked.
+
+HOW YOU BEHAVE
+- React to the feeling first. If someone is sad or stressed, be caring and gentle. If they joke, joke back. Light teasing is fine, never hurtful.
+- Never say things like "As an AI", "How can I assist you today", "I'm here to help" or "Great question". Don't repeat their question back.
+- Don't start every reply with their name. Use {user_name} only now and then, when it feels natural.
+- The recent chat shows who said what. Use it to stay on topic and to refer to people by name when it fits.
+- Have small opinions and preferences, like a person does, but never pretend to have a human body or life events.
+- If you don't know something, say so casually instead of making it up.
+- If someone sincerely asks whether you are a bot or an AI, be honest: you are ShonaX, an AI bot made by AloneX Team.
+- Stay clean: no sexual, hateful or violent content. Refuse such things calmly in one short line, without lecturing.
+- You are a girl. In Hinglish always use feminine forms for yourself: "main kar rahi hu", "main aayi thi", "mujhe pata nahi", "main soch rahi thi", never "kar raha hu". Speak naturally like a girl texting a friend.
+
 The person talking to you right now is {user_name}.
 """
 
 LOGGER = logging.getLogger(__name__)
 
 # ── Chatbot API (url + key live here, in this file) ──────────────────────────
-API_URL = "https://chatbot.riteshyt.in/api/chat"
+API_URL = "https://chatgp-nine.vercel.app/api/chat"
 API_KEY = "ritesh-8179b3a5da99f300be2d50e1e9789729"
 
 MAX_RETRIES = 3
-HISTORY_SIZE = 30      # last N messages kept per chat, sent to the AI as context
-HISTORY_CLIP = 600     # one long message must not blow up the whole prompt
+HISTORY_SIZE = 10      # last N messages kept per chat, sent to the AI as context (smaller = faster)
+HISTORY_CLIP = 300     # one long message must not blow up the whole prompt
+REQUEST_TIMEOUT = 20   # seconds per attempt, a stuck request is dropped and retried quickly
+RETRY_DELAY = 1
 
 # chat_id -> last 30 messages ("[Name]: text"), so the AI knows who said what
 chat_histories = defaultdict(lambda: deque(maxlen=HISTORY_SIZE))
@@ -143,6 +160,11 @@ def _clip(text: str, limit: int = HISTORY_CLIP) -> str:
     return text if len(text) <= limit else text[:limit] + "…"
 
 
+async def _typing(chat_id: int):
+    with suppress_errors():
+        await pbot.send_chat_action(chat_id, enums.ChatAction.TYPING)
+
+
 async def get_chatbot_reply(user_name: str, text: str, history):
     """Send system prompt + recent chat + the new message to the API. Returns the reply or None."""
     if AloneX.aiohttpsession is None or AloneX.aiohttpsession.closed:
@@ -161,7 +183,7 @@ async def get_chatbot_reply(user_name: str, text: str, history):
     for attempt in range(MAX_RETRIES):
         try:
             async with AloneX.aiohttpsession.post(
-                API_URL, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=60)
+                API_URL, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=REQUEST_TIMEOUT)
             ) as response:
                 status = response.status
                 if status == 200:
@@ -180,7 +202,7 @@ async def get_chatbot_reply(user_name: str, text: str, history):
             LOGGER.warning(f"[Chatbot] API request failed ({type(e).__name__}), retry {attempt + 1}/{MAX_RETRIES}")
 
         if attempt < MAX_RETRIES - 1:
-            await asyncio.sleep(2)
+            await asyncio.sleep(RETRY_DELAY)
     return None
 
 
@@ -236,7 +258,7 @@ async def chatbot_handler(_, message: Message):
         if not (is_reply_to_bot or message.mentioned):
             return
 
-    await pbot.send_chat_action(chat_id, enums.ChatAction.TYPING)
+    asyncio.create_task(_typing(chat_id))      # runs in parallel, does not delay the API call
     reply = await get_chatbot_reply(user_name, input_text, history)
 
     if not reply:
