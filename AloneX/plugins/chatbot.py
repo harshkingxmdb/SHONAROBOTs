@@ -2,6 +2,9 @@ import asyncio
 import logging
 import re
 import time
+from collections import deque, defaultdict
+from contextlib import suppress
+from io import BytesIO
 
 import aiohttp
 from pyrogram import filters, enums
@@ -11,7 +14,6 @@ from AloneX import pbot, prefix_cmds, font, init_aiohttp_session
 import AloneX
 from AloneX.helpers.decorator import protected_ids
 from AloneX.db.chatbot import add_chat, remove_chat, CHAT_IDS
-import config
 
 __module__ = "𝐂ʜᴀᴛ-𝐁ᴏᴛ🤖"
 __help__ = """
@@ -22,8 +24,8 @@ __help__ = """
 
 *Notes:*
 - In groups, the bot responds only when you REPLY to its message or @mention it.
-- Works with a GROQ_API_KEY; if Groq fails it uses GEMINI_API_KEY.
 - In private, the bot responds to all messages (must be enabled via /chatbot).
+- The bot remembers the last 30 messages of the chat, so it knows who said what.
 - Supports Hinglish and has a friendly, human-like persona.
 """
 
@@ -106,191 +108,156 @@ Be helpful, sometimes witty, and very natural in conversation.
 Keep your responses relatively short and engaging.
 If someone asks who made you, say you were created by AloneX Team.
 Use emojis occasionally to feel more human.
+The person talking to you right now is {user_name}.
 """
 
 LOGGER = logging.getLogger(__name__)
 
-from contextlib import suppress
+# ── Chatbot API (url + key live here, in this file) ──────────────────────────
+API_URL = "https://chatbot.riteshyt.in/api/chat"
+API_KEY = "ritesh-8179b3a5da99f300be2d50e1e9789729"
+
+MAX_RETRIES = 3
+HISTORY_SIZE = 30      # last N messages kept per chat, sent to the AI as context
+HISTORY_CLIP = 600     # one long message must not blow up the whole prompt
+
+# chat_id -> last 30 messages ("[Name]: text"), so the AI knows who said what
+chat_histories = defaultdict(lambda: deque(maxlen=HISTORY_SIZE))
+_notice_sent: dict = {}   # chat_id -> time of the last "AI is not working" notice
+
+# "/start", "!help", ".ping" ... -> a command for some other module, not a chat message
+_CMD_RE = re.compile(r"^[" + re.escape("".join(prefix_cmds)) + r"][A-Za-z]")
+
+_EXT = {
+    "python": ".py", "py": ".py", "javascript": ".js", "js": ".js", "html": ".html",
+    "css": ".css", "json": ".json", "cpp": ".cpp", "c++": ".cpp", "bash": ".sh", "sh": ".sh",
+}
 
 
 def suppress_errors():
     return suppress(Exception)
 
-GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODELS = ("llama-3.3-70b-versatile", "llama-3.1-8b-instant")
-GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta"
-GEMINI_MODELS = (
-    "gemini-3.5-flash", "gemini-3.6-flash", "gemini-3.7-flash",
-    "gemini-3.5-flash-lite", "gemini-flash-latest", "gemini-2.5-flash",
-)
 
-_groq_dead_until = 0.0        # a rejected key is not retried on every message
-_gemini_dead_until = 0.0
-_gemini_model = None          # the model that worked last
-_groq_model = GROQ_MODELS[0]
-_notice_sent: dict = {}       # chat_id -> time of the last "AI is not working" notice
+def _clip(text: str, limit: int = HISTORY_CLIP) -> str:
+    text = text.strip()
+    return text if len(text) <= limit else text[:limit] + "…"
 
 
-def _short(body, limit: int = 160) -> str:
-    """Error body -> one safe line for the log (never contains the key)."""
-    return re.sub(r"\s+", " ", str(body)).strip()[:limit]
-
-
-async def _groq_reply(text: str):
-    global _groq_dead_until, _groq_model
-    key = getattr(config, "GROQ_API_KEY", "")
-    if not key or time.time() < _groq_dead_until:
-        return None
-
-    models = [_groq_model] + [m for m in GROQ_MODELS if m != _groq_model]
-    headers = {"Authorization": f"Bearer {key}"}
-    for model in models:
-        data = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": CHATBOT_PROMPT},
-                {"role": "user", "content": text},
-            ],
-        }
-        try:
-            async with AloneX.aiohttpsession.post(
-                GROQ_URL, headers=headers, json=data, timeout=aiohttp.ClientTimeout(total=40)
-            ) as response:
-                if response.status == 200:
-                    res_json = await response.json()
-                    content = ((res_json.get("choices") or [{}])[0].get("message") or {}).get("content")
-                    if content:
-                        _groq_model = model
-                        return content
-                    return None
-                body = await response.text()
-                if response.status in (401, 403):             # key rejected -> stop asking Groq for 10 minutes
-                    _groq_dead_until = time.time() + 600
-                    LOGGER.error(f"[Chatbot] Groq rejected GROQ_API_KEY (HTTP {response.status}): {_short(body)}")
-                    return None
-                if response.status == 429:
-                    _groq_dead_until = time.time() + 30
-                    LOGGER.warning("[Chatbot] Groq rate limit (HTTP 429)")
-                    return None
-                LOGGER.warning(f"[Chatbot] Groq {model} HTTP {response.status}: {_short(body)}")
-                continue                                      # e.g. model removed -> try the next one
-        except Exception as e:
-            LOGGER.warning(f"[Chatbot] Groq request failed: {type(e).__name__}")
-            return None
-    return None
-
-
-async def _gemini_reply(text: str):
-    global _gemini_dead_until, _gemini_model
-    key = getattr(config, "GEMINI_API_KEY", "")
-    if not key or time.time() < _gemini_dead_until:
-        return None
-
-    models = list(GEMINI_MODELS)
-    if _gemini_model in models:
-        models.remove(_gemini_model)
-        models.insert(0, _gemini_model)
-
-    payload = {
-        "systemInstruction": {"parts": [{"text": CHATBOT_PROMPT}]},
-        "contents": [{"role": "user", "parts": [{"text": text}]}],
-    }
-    headers = {"Content-Type": "application/json", "x-goog-api-key": key}
-    refused = []
-    for model in models:
-        try:
-            async with AloneX.aiohttpsession.post(
-                f"{GEMINI_BASE}/models/{model}:generateContent",
-                headers=headers, json=payload, timeout=aiohttp.ClientTimeout(total=40),
-            ) as response:
-                status = response.status
-                body = await response.json(content_type=None) if status == 200 else await response.text()
-        except Exception as e:
-            LOGGER.warning(f"[Chatbot] Gemini request failed: {type(e).__name__}")
-            return None
-
-        if status == 200:
-            parts = (((body.get("candidates") or [{}])[0]).get("content") or {}).get("parts") or []
-            reply = "".join(p.get("text", "") for p in parts).strip()
-            if reply:
-                _gemini_model = model
-                return reply
-            return None
-        if status == 404:                      # model does not exist (any more)
-            continue
-        if status in (400, 401, 403):          # key refused, maybe only by THIS model -> try the next one
-            refused.append((status, _short(body)))
-            continue
-        if status == 429:
-            _gemini_dead_until = time.time() + 30
-            LOGGER.warning("[Chatbot] Gemini rate limit (HTTP 429)")
-            return None
-        LOGGER.warning(f"[Chatbot] Gemini {model} HTTP {status}: {_short(body)}")
-        return None
-
-    if refused:                                # no model accepted the key
-        _gemini_dead_until = time.time() + 600
-        LOGGER.error(f"[Chatbot] Gemini rejected GEMINI_API_KEY (HTTP {refused[-1][0]}): {refused[-1][1]}")
-    return None
-
-
-async def get_chatbot_reply(text: str):
-    if AloneX.aiohttpsession is None:
+async def get_chatbot_reply(user_name: str, text: str, history):
+    """Send system prompt + recent chat + the new message to the API. Returns the reply or None."""
+    if AloneX.aiohttpsession is None or AloneX.aiohttpsession.closed:
         await init_aiohttp_session()
 
-    for backend in (_groq_reply, _gemini_reply):
+    prompt = CHATBOT_PROMPT.strip().replace("{user_name}", user_name)
+    history_str = "\n".join(history)
+    formatted_prompt = (
+        f"System: {prompt}\n\n"
+        f"Recent Chat Context:\n{history_str}\n\n"
+        f"User: {text}\nAssistant:"
+    )
+    payload = {"prompt": formatted_prompt}
+    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+
+    for attempt in range(MAX_RETRIES):
         try:
-            reply = await backend(text)
-        except Exception as e:
-            LOGGER.warning(f"[Chatbot] {backend.__name__} error: {type(e).__name__}")
-            reply = None
-        if reply:
-            return reply
+            async with AloneX.aiohttpsession.post(
+                API_URL, json=payload, headers=headers, timeout=aiohttp.ClientTimeout(total=60)
+            ) as response:
+                status = response.status
+                if status == 200:
+                    data = await response.json(content_type=None)
+                    reply = data.get("response") if isinstance(data, dict) else None
+                    if reply and "503" not in reply and "系统通知" not in reply:
+                        return reply
+                    LOGGER.warning("[Chatbot] API returned an empty/error reply")
+                elif status in (500, 502, 503, 429):
+                    LOGGER.warning(f"[Chatbot] API HTTP {status}, retry {attempt + 1}/{MAX_RETRIES}")
+                else:
+                    body = re.sub(r"\s+", " ", await response.text()).strip()[:160]
+                    LOGGER.error(f"[Chatbot] API HTTP {status}: {body}")
+                    return None            # key rejected / bad request -> retrying will not help
+        except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+            LOGGER.warning(f"[Chatbot] API request failed ({type(e).__name__}), retry {attempt + 1}/{MAX_RETRIES}")
+
+        if attempt < MAX_RETRIES - 1:
+            await asyncio.sleep(2)
     return None
 
-@pbot.on_message(
-    (filters.text | filters.caption)
-    & ~filters.bot
-    & ~filters.command(["chatbot", "AloneX", "gpt", "groq", "google", "gemini"])
-    , group=10
-)
+
+def _split_long_code(reply: str):
+    """Code blocks longer than 5 lines are taken out of the text and returned as files."""
+    files = []
+
+    def _swap(match):
+        lang, code = match.group(1), match.group(2).strip()
+        if len(code.split("\n")) <= 5:
+            return match.group(0)
+        name = f"code_snippet_{len(files) + 1}{_EXT.get(lang.lower(), f'.{lang}' if lang else '.txt')}"
+        file_obj = BytesIO(code.encode("utf-8"))
+        file_obj.name = name
+        files.append(file_obj)
+        return f"**[Long code block sent as file: {name}]**"
+
+    text = re.sub(r"```([\w+#.-]*)\n(.*?)```", _swap, reply, flags=re.DOTALL)
+    return text, files
+
+
+@pbot.on_message((filters.text | filters.caption) & ~filters.bot, group=10)
 async def chatbot_handler(_, message: Message):
     chat_id = message.chat.id
 
-    if chat_id not in CHAT_IDS:
+    if chat_id not in CHAT_IDS or not message.from_user:
         return
 
-    # In groups, check if it's a mention or reply to bot
+    input_text = (message.text or message.caption or "").strip()
+    if not input_text or _CMD_RE.match(input_text):
+        return
+
+    # Remove bot mention from text if present
+    if pbot.me and pbot.me.username:
+        input_text = input_text.replace(f"@{pbot.me.username}", "").strip()
+        if not input_text:
+            return
+
+    user_name = message.from_user.first_name or "Unknown"
+
+    # Context = what was said BEFORE this message (this message is sent separately as "User:")
+    history = list(chat_histories[chat_id])
+    # Always log the message, even when the bot does not answer it
+    chat_histories[chat_id].append(f"[{user_name}]: {_clip(input_text)}")
+
+    # In groups, answer only to a reply to the bot or a mention
     if message.chat.type in (enums.ChatType.GROUP, enums.ChatType.SUPERGROUP):
         is_reply_to_bot = (
             message.reply_to_message
             and message.reply_to_message.from_user
             and message.reply_to_message.from_user.is_self
         )
-        is_mentioned = message.mentioned
-
-        if not (is_reply_to_bot or is_mentioned):
+        if not (is_reply_to_bot or message.mentioned):
             return
 
-    input_text = message.text or message.caption
-    if not input_text:
+    await pbot.send_chat_action(chat_id, enums.ChatAction.TYPING)
+    reply = await get_chatbot_reply(user_name, input_text, history)
+
+    if not reply:
+        # No AI answered. Tell the chat (at most once every 10 minutes) instead of staying silent.
+        now = time.time()
+        if now - _notice_sent.get(chat_id, 0) > 600:
+            _notice_sent[chat_id] = now
+            with suppress_errors():
+                await message.reply_text(
+                    "⚠️ ᴀɪ ɪs ɴᴏᴛ ᴡᴏʀᴋɪɴɢ ʀɪɢʜᴛ ɴᴏᴡ. ᴛʜᴇ ʙᴏᴛ ᴏᴡɴᴇʀ ɴᴇᴇᴅs ᴛᴏ ᴄʜᴇᴄᴋ ᴛʜᴇ ᴄʜᴀᴛʙᴏᴛ ᴀᴘɪ."
+                )
         return
 
-    # Remove bot mention from text if present
-    if f"@{pbot.me.username}" in input_text:
-        input_text = input_text.replace(f"@{pbot.me.username}", "").strip()
+    chat_histories[chat_id].append(f"[Assistant]: {_clip(reply)}")
 
-    await pbot.send_chat_action(chat_id, enums.ChatAction.TYPING)
-    reply = await get_chatbot_reply(input_text)
-
-    if reply:
-        return await message.reply_text(reply)
-
-    # No AI answered. Tell the chat (at most once every 10 minutes) instead of staying silent.
-    now = time.time()
-    if now - _notice_sent.get(chat_id, 0) > 600:
-        _notice_sent[chat_id] = now
-        with suppress_errors():
-            await message.reply_text(
-                "⚠️ ᴀɪ ɪs ɴᴏᴛ ᴡᴏʀᴋɪɴɢ ʀɪɢʜᴛ ɴᴏᴡ. ᴛʜᴇ ʙᴏᴛ ᴏᴡɴᴇʀ ɴᴇᴇᴅs ᴛᴏ ᴄʜᴇᴄᴋ ᴛʜᴇ ɢʀᴏǫ / ɢᴇᴍɪɴɪ ᴀᴘɪ ᴋᴇʏ."
-            )
+    try:
+        text, files = _split_long_code(reply)
+        text = text.strip()
+        for i in range(0, len(text), 4000):          # Telegram limit is 4096 chars
+            await message.reply_text(text[i:i + 4000])
+        for f in files:
+            await message.reply_document(document=f)
+    except Exception as e:
+        LOGGER.error(f"[Chatbot] failed to send reply: {type(e).__name__}: {e}")
