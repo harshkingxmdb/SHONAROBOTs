@@ -146,8 +146,8 @@ GROQ_API_KEY = getenv("GROQ_API_KEY", "gsk_WmbsfE052YwzfqUqB9ugWGdyb3FYGx714Sats
 GEMINI_API_KEY = getenv("GEMINI_API_KEY", "AQ.Ab8RN6IvlG0ZWQ0aPqhqq5XXUZv8WNDJneEBPvd1IxNi3y8Akg")
 MONSTER_API_KEY = getenv("MONSTER_API_KEY", "0")
 # Cloudflare Workers AI (free 10,000 neurons / day): used by the anti-NSFW cloud check and by /draw
-CF_ACCOUNT_ID = getenv("CF_ACCOUNT_ID", "")
-CF_API_TOKEN = getenv("CF_API_TOKEN", "")
+CF_ACCOUNT_ID = getenv("CF_ACCOUNT_ID", "304dae051d26f169f1438f0142e19c95")
+CF_API_TOKEN = getenv("CF_API_TOKEN", "cfat_uS7tNEX6pqIiKXY8ZOAz62LGCTbpvmZXfQLrqu3S8313ffce")
 REPLICATE_API_TOKEN = getenv("REPLICATE_API_TOKEN", "r8_Wis2Jd4QIKQQPfwtLIjNbOyJqBaeow60fvaoo")
 GIST_TOKEN = getenv("GIST_TOKEN")
 
