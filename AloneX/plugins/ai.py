@@ -42,7 +42,7 @@ This module provides access to multiple AI tools: ShonaX AI, ChatGPT, Groq AI, G
 
 # ── API settings ─────────────────────────────────────────────────────────────
 # Chat API (used by /gpt and as a backup for /ShonaX, /groq, /gemini)
-CHAT_API_URL = "https://chatgp-nine.vercel.app/api/chat"
+CHAT_API_URL = "https://chatbot.riteshyt.in/api/chat"
 CHAT_API_KEY = "ritesh-8179b3a5da99f300be2d50e1e9789729"
 
 # Models are tried in this order. Old ones were shut down by the providers
@@ -52,12 +52,12 @@ GROQ_MODELS = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
 
 # /draw: Cloudflare Workers AI (FLUX.1 schnell, free daily allowance). Needs both Config Vars.
 # If they are not set, /draw automatically uses the key-less Pollinations backup.
-CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID", "")
-CF_API_TOKEN = os.getenv("CF_API_TOKEN", "")
+CF_ACCOUNT_ID = os.getenv("CF_ACCOUNT_ID", "304dae051d26f169f1438f0142e19c95")
+CF_API_TOKEN = os.getenv("CF_API_TOKEN", "cfat_tVs2BbB66Jjuv8OxRy3PjziqzjWIK47zFupId7Sr8c71a343")
 CF_MODEL = "@cf/black-forest-labs/flux-1-schnell"
 
 PERSONA = (
-    "You are ShonaX, a friendly, smart and helpful AI assistant made by AloneX Team. "
+    "You are ShonaX, a friendly, smart and helpful AI assistant made by ShonaX Team. "
     "Reply in the same language as the user (Hinglish if they write Hinglish). "
     "Be clear and to the point."
 )
