@@ -1,3 +1,4 @@
+# NSFW_CLOUD_ALL = True
 
 <h2 align="center">
     𖢵 ᴀʅσηҽ χ яσвσт 𖢵
