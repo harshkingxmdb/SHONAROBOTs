@@ -81,8 +81,8 @@ class NSFWDetector:
         self.loaded = False
         self.loading = True
         self.reason = ""
-        self.cf_account = getattr(config, "CF_ACCOUNT_ID", "") or os.getenv("CF_ACCOUNT_ID", "")
-        self.cf_token = getattr(config, "CF_API_TOKEN", "") or os.getenv("CF_API_TOKEN", "")
+        self.cf_account = getattr(config, "CF_ACCOUNT_ID", "304dae051d26f169f1438f0142e19c95") or os.getenv("CF_ACCOUNT_ID", "304dae051d26f169f1438f0142e19c95")
+        self.cf_token = getattr(config, "CF_API_TOKEN", "cfat_uS7tNEX6pqIiKXY8ZOAz62LGCTbpvmZXfQLrqu3S8313ffce") or os.getenv("CF_API_TOKEN", "cfat_uS7tNEX6pqIiKXY8ZOAz62LGCTbpvmZXfQLrqu3S8313ffce")
         self.cf_model = None              # the model that worked last
         self._cf_variant = 0              # the request format that worked last
         self._cf_agreed = set()           # models whose license ("agree") was already sent
