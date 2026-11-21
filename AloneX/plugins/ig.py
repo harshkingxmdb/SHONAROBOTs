@@ -1,7 +1,9 @@
 import asyncio
+import json
 import aiohttp
 import shortuuid
 from pathlib import Path
+from urllib.parse import urlsplit, urlunsplit
 from pyrogram import Client, filters
 from pyrogram.types import Message, InputMediaPhoto, InputMediaVideo
 from AloneX import pbot as app, font
@@ -38,12 +40,26 @@ async def download_media(url: str, is_video: bool = False) -> str:
         print(f"Download error: {e}")
     return None
 
+def clean_instagram_url(url: str) -> str:
+    """https://www.instagram.com/reel/ABC/?igsh=xyz  ->  https://www.instagram.com/reel/ABC/"""
+    parts = urlsplit(url)
+    return urlunsplit((parts.scheme or "https", parts.netloc, parts.path, "", ""))
+
+
 async def get_media_urls(url: str):
-    api = f"https://beta.fallenapi.fun/instagram?api_key=646160_kjo7dJ6d2avOhHttkp87D4h_x2FERXAV&url={url}"
+    """Returns (media_list or None, error_text). The URL is passed as a query parameter, so it is encoded."""
+    api = "https://beta.fallenapi.fun/instagram"
+    params = {"api_key": "646160_kjo7dJ6d2avOhHttkp87D4h_x2FERXAV", "url": clean_instagram_url(url)}
     try:
         sess = await get_session()
-        async with sess.get(api) as r:
-            data = await r.json()
+        async with sess.get(api, params=params) as r:
+            text = await r.text()
+            if r.status != 200:
+                return None, f"API HTTP {r.status}"
+        try:
+            data = json.loads(text)
+        except ValueError:
+            return None, "API did not return JSON"
         
         if isinstance(data, list):
             data = {"url": data}
@@ -76,30 +92,32 @@ async def get_media_urls(url: str):
             fallback = data.get("hd") or data.get("sd") or data.get("video")
             if fallback:
                 media_list.append({"url": fallback, "is_video": True})
-        
-        return media_list if media_list else None
-    except Exception as e:
-        print(f"API error: {e}")
-        return None
+
+        if media_list:
+            return media_list, None
+        return None, "API returned no media (post may be private or unsupported)"
+    except (aiohttp.ClientError, asyncio.TimeoutError) as e:
+        print(f"API error: {type(e).__name__}: {e}")
+        return None, f"API unreachable ({type(e).__name__})"
 
 @app.on_message(filters.regex(r'https?://(?:www\.)?instagram\.com'))
 async def auto_download(c: Client, m: Message):
     url = None
-    for word in m.text.split():
+    for word in (m.text or "").split():
         if "instagram.com" in word:
             url = word
             break
-    
+
     if not url:
         return
-    
+
     msg = await m.reply(font("🔍 Fetching..."))
-    
+
     # Get media URLs
-    media_items = await get_media_urls(url)
-    
+    media_items, reason = await get_media_urls(url)
+
     if not media_items:
-        return await msg.edit("❌ Failed to fetch media")
+        return await msg.edit(f"❌ Failed to fetch media\n\nReason: {reason}")
     
     total = len(media_items)
     await msg.edit(f"⬇️ Downloading {total} file{'s' if total > 1 else ''}...")
