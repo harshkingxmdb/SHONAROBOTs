@@ -318,7 +318,7 @@ class MusicConfig:
         # ---- API (single API: search, /play, /vplay, all platforms) ----
         # Key: https://yt.riteshyt.in/dashboard  (ya Telegram bot par /generate)
         self.RITESH_API_URL = getenv("RITESH_API_URL", "https://api.riteshyt.in")
-        self.RITESH_API_KEY = getenv("RITESH_API_KEY", "riteshfree486b70904aef797c782587af")
+        self.RITESH_API_KEY = getenv("RITESH_API_KEY", "riteshfreeb4b51bb4314b87718b7d97dd")
         # Purana Fallen client (core/_api.py) ab use nahi hota; defaults khali hain
         self.API_URL = getenv("API_URL", "")
         self.API_KEY = getenv("API_KEY", "")
